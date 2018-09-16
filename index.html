@@ -14,6 +14,7 @@ precision highp float;
 uniform float u_time;
 uniform vec2 translate;
 uniform vec2 scale;
+uniform float rotate;
 uniform float r;
 uniform float g;
 uniform float b;
@@ -21,7 +22,16 @@ uniform float b;
 void main(void) {
 
   float x = ( gl_FragCoord.x + translate.x ) * scale.x;
-  float y = ( gl_FragCoord.y + translate.y ) * scale.y;
+  float y = ( gl_FragCoord.y + translate.y ) * scale.y + 1.0;
+
+  float sin_theta = sin(rotate);
+  float cos_theta = cos(rotate);
+
+  float x2 = cos_theta * x - sin_theta * y;
+  float y2 = sin_theta * x + cos_theta * y;
+
+  x = x2;
+  y = y2;
 
   float z = 0.0;
 
@@ -29,7 +39,10 @@ void main(void) {
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * x + y * y; // circle
-  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  //z = 0.0 - x * x - x * y - y * y;  // phi
+  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
+  z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // animate by varying the result with u_time which is sin(framenumber) and make the centre white
   z = z * -u_time;

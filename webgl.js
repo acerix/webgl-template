@@ -2,7 +2,7 @@
 
 /* WebGL helper functions */
 
-// @todo this file needs a massive cleanup
+// @todo needs a massive cleanup
 
 // @todo get rid of globals
 var ctx
@@ -12,13 +12,17 @@ var colorLocation
 var squareVerticesColorBuffer
 var gl_translate = [0, 0]
 var gl_scale = [1, 1]
+var gl_rotate = 0
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
 var rUniform, gUniform, bUniform
 var focused = true
 var pot = 0
-const PHI = ( 1 + Math.sqrt(5) ) / 2
-const rotate_increment = 2 * Math.PI / Math.pow(PHI,2)
 
+// random values
+var rand_r = Math.random() / 8;
+var rand_g = Math.random() / 8;
+var rand_b = Math.random() / 8;
+var rand_t = Math.random() / 64;
 
 // Set up canvas
 function launchWebGL() {
@@ -37,25 +41,27 @@ function launchWebGL() {
   canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
 
   gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-  gl_scale = [1/512, 1/512]
+  gl_scale = [1/128, 1/128]
+  gl_rotate = -1/8
 
   init()
   life()
-
 }
 
 // Draw a frame
 function drawScene() {
   pot++
 
-  gl.uniform1f(timeUniform, Math.tan(pot / 10))
+  gl.uniform1f(timeUniform, Math.sin(pot * rand_t) / 2 + 1)
 
-  gl.uniform1f(rUniform, Math.sin(pot / 79))
-  gl.uniform1f(gUniform, Math.sin(pot / 71))
-  gl.uniform1f(bUniform, Math.sin(pot / 73))
+  gl.uniform1f(rUniform, Math.sin(pot * rand_r))
+  gl.uniform1f(gUniform, Math.sin(pot * rand_g))
+  gl.uniform1f(bUniform, Math.sin(pot * rand_b))
 
   gl.uniform2f(translateUniform, gl_translate[0], gl_translate[1])
   gl.uniform2f(scaleUniform, gl_scale[0], gl_scale[1])
+  gl.uniform1f(rotateUniform, 2 * Math.PI * gl_rotate)
+
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, numVertices)
   //var e while (e = gl.getError()) console.log('GL error', e)
 }
@@ -71,17 +77,11 @@ function init() {
   initShaders()
 }
 
-// Polyfill for requestAnimationFrame
-window.vsync = (function(){ return window.requestAnimationFrame
-||  window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame
-||  function(callback,element){window.setTimeout(callback,16.66)}
-})()
-
 // Looping callback
 function life() {
-  if (!focused) return window.setTimeout(life, 999)
+  if (!focused) return window.setTimeout(life, 99)
   drawScene()
-  vsync(life)
+  window.requestAnimationFrame(life)
 }
 
 // Keep track of browser focus so we can sleep in the background
@@ -127,6 +127,7 @@ function initShaders() {
   timeUniform = gl.getUniformLocation(shaderProgram, 'u_time')
   translateUniform = gl.getUniformLocation(shaderProgram, 'translate')
   scaleUniform = gl.getUniformLocation(shaderProgram, 'scale')
+  rotateUniform = gl.getUniformLocation(shaderProgram, 'rotate')
 
   rUniform = gl.getUniformLocation(shaderProgram, 'r')
   gUniform = gl.getUniformLocation(shaderProgram, 'g')
@@ -138,6 +139,7 @@ function initShaders() {
     +1, -1, 0,
     -1, -1, 0
   ]
+
   positionBuffer = gl.createBuffer()
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
