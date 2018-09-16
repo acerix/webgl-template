@@ -173,9 +173,13 @@ export class sWebGL {
     this.zoom = 1 / 128
 
     // Linear zoom increment
-    this.incrementZoom = function(increment) {
+    this.incrementZoom = function(increment, point) {
       this.zoom *= (1 - increment / 8)
       gl_scale[0] = gl_scale[1] = this.zoom
+      if (typeof point === 'object') {
+        gl_translate[0] -= (point[0] - canvas.centre[0]) / 128
+        gl_translate[1] -= (point[1] - canvas.centre[1]) / 128
+      }
     }
 
     // Linear move increment

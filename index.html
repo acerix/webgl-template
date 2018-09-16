@@ -90,7 +90,7 @@ window.onload = function() {
         whileDown: {
           // left-click: Zoom in
           0: function() {
-            swgl.incrementZoom(1)
+            swgl.incrementZoom(1, swgl.plugins.mouse.p)
           },
           // right-click: Zoom out
           2: function() {
