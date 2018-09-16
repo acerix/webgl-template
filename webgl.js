@@ -13,6 +13,7 @@ var squareVerticesColorBuffer
 var gl_translate = [0, 0]
 var gl_scale = [1, 1]
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
+var rUniform, gUniform, bUniform
 var focused = true
 var pot = 0
 const PHI = ( 1 + Math.sqrt(5) ) / 2
@@ -46,7 +47,13 @@ function launchWebGL() {
 // Draw a frame
 function drawScene() {
   pot++
-  gl.uniform1f(timeUniform, Math.tan(pot / 64))
+
+  gl.uniform1f(timeUniform, Math.sin(pot / 128))
+
+  gl.uniform1f(rUniform, Math.sin(pot / 13))
+  gl.uniform1f(gUniform, Math.sin(pot / 19))
+  gl.uniform1f(bUniform, Math.sin(pot / 17))
+
   gl.uniform2f(translateUniform, gl_translate[0], gl_translate[1])
   gl.uniform2f(scaleUniform, gl_scale[0], gl_scale[1])
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, numVertices)
@@ -120,6 +127,10 @@ function initShaders() {
   timeUniform = gl.getUniformLocation(shaderProgram, 'u_time')
   translateUniform = gl.getUniformLocation(shaderProgram, 'translate')
   scaleUniform = gl.getUniformLocation(shaderProgram, 'scale')
+
+  rUniform = gl.getUniformLocation(shaderProgram, 'r')
+  gUniform = gl.getUniformLocation(shaderProgram, 'g')
+  bUniform = gl.getUniformLocation(shaderProgram, 'b')
 
   vertices = [
     +1, +1, 0,
