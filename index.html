@@ -79,10 +79,87 @@ void main(void) {
 'set strict'
 
 import {sWebGL} from './sWebGL.mjs'
+import {sMouse} from './sMouse.mjs'
+import {sKeys} from './sKeys.mjs'
 
 window.onload = function() {
-  sWebGL({
+  var swgl = new sWebGL({
+    plugins: {
 
+      'mouse': new sMouse({
+        whileDown: {
+          // left-click: Zoom in
+          0: function() {
+            swgl.incrementZoom(1)
+          },
+          // right-click: Zoom out
+          2: function() {
+            swgl.incrementZoom(-1)
+          }
+        },
+        onDown: {
+          // middle-click: Reset
+          1: function() {
+            swgl.zoom = 1 / 128
+            swgl.incrementZoom(0)
+            swgl.moveToCentre()
+          }
+        },
+        onWheel: function(i) {
+          swgl.incrementZoom(i)
+        }
+      }),
+
+      'keys': new sKeys({
+        onDown: {
+
+          // +: Zoom in
+          107: function() {
+            swgl.incrementZoom(1)
+          },
+          // -: Zoom out
+          109: function() {
+            swgl.incrementZoom(-1)
+          },
+
+          // up: Up
+          38: function() {
+            swgl.move(0, 32)
+          },
+          // left: Left
+          37: function() {
+            swgl.move(-32, 0)
+          },
+          // down: Down
+          40: function() {
+            swgl.move(0, -32)
+          },
+          // right: Right
+          39: function() {
+            swgl.move(32, 0)
+          },
+
+          // w: Up
+          87: function() {
+            swgl.move(0, 1)
+          },
+          // a: Left
+          65: function() {
+            swgl.move(-1, 0)
+          },
+          // s: Down
+          83: function() {
+            swgl.move(0, -1)
+          },
+          // d: Right
+          68: function() {
+            swgl.move(1, 0)
+          }
+
+        }
+      })
+
+    }
   })
 }
 

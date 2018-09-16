@@ -1,5 +1,7 @@
 'set strict'
 
+/* Handle WebGL */
+
 // @todo needs a massive cleanup
 
 // @todo get rid of globals
@@ -14,7 +16,6 @@ var gl_rotate = 0
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
 var translateUniform, scaleUniform, rotateUniform
 var rUniform, gUniform, bUniform
-var focused = true
 var pot = 0
 
 // random values
@@ -24,9 +25,27 @@ var rand_b = Math.random() / 8;
 var rand_t = Math.random() / 64;
 
 
+
+// Keep track of browser focus to sleep in the background
+var windowFocused = true
+window.onfocus = function() {windowFocused = true}
+window.onblur = function() {windowFocused = false}
+
+
+
 // Draw a frame
-function drawScene() {
+function drawScene(swgl) {
   pot++
+
+  if (typeof swgl.plugins === 'object') {
+    for (var i in swgl.plugins) if (swgl.plugins[i].hasOwnProperty('whileDown')) {
+      for (var j in swgl.plugins[i].whileDown) {
+        if (swgl.plugins[i].b[j]) {
+          swgl.plugins[i].whileDown[j]()
+        }
+      }
+    }
+  }
 
   gl.uniform1f(timeUniform, Math.sin(pot * rand_t) / 2 + 1)
 
@@ -54,15 +73,22 @@ function init() {
 }
 
 // Looping callback
-function life() {
-  if (!focused) return window.setTimeout(life, 99)
-  drawScene()
-  window.requestAnimationFrame(life)
+function life(swgl) {
+
+  var callback = function() {
+    life(swgl)
+  }
+
+  // Sleep in background
+  if (!windowFocused) return window.setTimeout(callback, 99)
+
+  // Draw
+  drawScene(swgl)
+
+  // Loop after vsync
+  window.requestAnimationFrame(callback)
 }
 
-// Keep track of browser focus so we can sleep in the background
-window.onfocus = function() {focused = true}
-window.onblur = function() {focused = false}
 
 // Handle viewport resize
 window.onresize = function() {
@@ -134,24 +160,67 @@ function initShaders() {
 
 
 // Init
-export function sWebGL(options) {
+export class sWebGL {
 
-  // Create canvas DOM element
-  canvas = document.createElement('canvas')
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  document.body.appendChild(canvas)
+  constructor(options) {
 
-  var gl_settings = {alpha: false, preserveDrawingBuffer: true}
+    var self = this
 
-  gl = canvas.getContext('webgl', gl_settings)
+    // Plugins
+    this.plugins = options.hasOwnProperty('plugins') ? options.plugins : {}
 
-  canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+    // Zoom level
+    this.zoom = 1 / 128
 
-  gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-  gl_scale = [1/128, 1/128]
-  gl_rotate = -1/8
+    // Linear zoom increment
+    this.incrementZoom = function(increment) {
+      this.zoom *= (1 - increment / 8)
+      gl_scale[0] = gl_scale[1] = this.zoom
+    }
 
-  init()
-  life()
+    // Linear move increment
+    this.move = function(increment_x, increment_y) {
+      gl_translate[0] -= increment_x
+      gl_translate[1] -= increment_y
+    }
+
+    // Absolute move to position
+    this.moveTo = function(x, y) {
+      gl_translate[0] = x
+      gl_translate[1] = y
+    }
+
+    // Recentre
+    this.moveToCentre = function() {
+      gl_translate[0] = -canvas.centre[0]
+      gl_translate[1] = -canvas.centre[1]
+    }
+
+
+
+
+
+
+    // Create canvas DOM element
+    canvas = document.createElement('canvas')
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    document.body.appendChild(canvas)
+
+    gl = canvas.getContext('webgl', {
+      alpha: false,
+      preserveDrawingBuffer: true
+    })
+
+    canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+
+    gl_translate = [-canvas.centre[0], -canvas.centre[1]]
+    gl_scale = [1/128, 1/128]
+    gl_rotate = -1/8
+
+    init()
+    life(self)
+
+  }
+
 }
