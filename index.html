@@ -28,11 +28,11 @@ void main(void) {
   // function to calculate z from x and y
   //z = x - y; // line
   //z = x * x - y; // parabola
-  z = x * x + y * y; // circle
-  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  //z = x * x + y * y; // circle
+  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
 
   // animate by varying the result with u_time which is sin(framenumber) and make the centre white
-  z = 1.0 - z * -u_time;
+  z = z * -u_time;
 
   // grey
   // gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;

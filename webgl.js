@@ -48,11 +48,11 @@ function launchWebGL() {
 function drawScene() {
   pot++
 
-  gl.uniform1f(timeUniform, Math.sin(pot / 128))
+  gl.uniform1f(timeUniform, Math.tan(pot / 10))
 
-  gl.uniform1f(rUniform, Math.sin(pot / 13))
-  gl.uniform1f(gUniform, Math.sin(pot / 19))
-  gl.uniform1f(bUniform, Math.sin(pot / 17))
+  gl.uniform1f(rUniform, Math.sin(pot / 79))
+  gl.uniform1f(gUniform, Math.sin(pot / 71))
+  gl.uniform1f(bUniform, Math.sin(pot / 73))
 
   gl.uniform2f(translateUniform, gl_translate[0], gl_translate[1])
   gl.uniform2f(scaleUniform, gl_scale[0], gl_scale[1])
