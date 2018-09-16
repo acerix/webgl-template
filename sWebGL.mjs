@@ -1,6 +1,4 @@
-'set strict';
-
-/* WebGL helper functions */
+'set strict'
 
 // @todo needs a massive cleanup
 
@@ -14,6 +12,7 @@ var gl_translate = [0, 0]
 var gl_scale = [1, 1]
 var gl_rotate = 0
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
+var translateUniform, scaleUniform, rotateUniform
 var rUniform, gUniform, bUniform
 var focused = true
 var pot = 0
@@ -24,29 +23,6 @@ var rand_g = Math.random() / 8;
 var rand_b = Math.random() / 8;
 var rand_t = Math.random() / 64;
 
-// Set up canvas
-function launchWebGL() {
-  canvas = document.createElement('canvas')
-  canvas.id = 'canvas'
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-
-  document.body.appendChild(canvas)
-
-  var gl_settings = {alpha: false, preserveDrawingBuffer: true}
-
-  gl = canvas.getContext('webgl', gl_settings)
-    || canvas.getContext('experimental-webgl', gl_settings)
-
-  canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
-
-  gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-  gl_scale = [1/128, 1/128]
-  gl_rotate = -1/8
-
-  init()
-  life()
-}
 
 // Draw a frame
 function drawScene() {
@@ -153,4 +129,29 @@ function initShaders() {
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
   gl.vertexAttribPointer(positionAttr, 3, gl.FLOAT, false, 0, 0)
 
+}
+
+
+
+// Init
+export function sWebGL(options) {
+
+  // Create canvas DOM element
+  canvas = document.createElement('canvas')
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  document.body.appendChild(canvas)
+
+  var gl_settings = {alpha: false, preserveDrawingBuffer: true}
+
+  gl = canvas.getContext('webgl', gl_settings)
+
+  canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+
+  gl_translate = [-canvas.centre[0], -canvas.centre[1]]
+  gl_scale = [1/128, 1/128]
+  gl_rotate = -1/8
+
+  init()
+  life()
 }

@@ -44,11 +44,11 @@ void main(void) {
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
-  // animate by varying the result with u_time which is sin(framenumber) and make the centre white
+  // animate by varying the result with u_time
   z = z * -u_time;
 
   // grey
-  // gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
+  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
 
   // set pixel colours
   gl_FragColor.r = z + r;
@@ -75,12 +75,15 @@ void main(void) {
 
 </script>
 
-<script src="./webgl.js"></script>
-<script>
-'set strict';
+<script type="module">
+'set strict'
+
+import {sWebGL} from './sWebGL.mjs'
 
 window.onload = function() {
-  launchWebGL()
+  sWebGL({
+
+  })
 }
 
 </script>
