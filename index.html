@@ -5,25 +5,36 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
 <title>WebGL App</title>
 </head>
-<body style='overflow:hidden;margin:0;background-color:#979'>
+<body style='overflow:hidden;margin:0;background-color:#888'>
 
 <script id='shader-fs' type='text/x-fragment_shader'>
 
 precision highp float;
+
 uniform float u_time;
 uniform vec2 translate;
 uniform vec2 scale;
 
 void main(void) {
 
-  float m_0 = ( gl_FragCoord.x + translate.x ) * scale.x;
-  float m_1 = ( gl_FragCoord.y + translate.y ) * scale.y;
+  float x = ( gl_FragCoord.x + translate.x ) * scale.x;
+  float y = ( gl_FragCoord.y + translate.y ) * scale.y;
 
-  float z = m_1 - m_0 * m_0;
+  float z = 0.0;
 
-  gl_FragColor.r = mod(z + u_time, 1.0);
-  gl_FragColor.g = mod(z + u_time * 0.07, 1.0);
-  gl_FragColor.b = mod(z + u_time * 0.03, 1.0);
+  // function to calculate z from x and y
+  //z = x - y; // line
+  //z = x * x - y; // parabola
+  //z = x * x + y * y; // circle
+  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+
+  // animate by varying the result with u_time which is sin(framenumber) and make the centre white
+  z = 1.0 - z * -u_time;
+
+  // set pixel colours
+  gl_FragColor.r = z;
+  gl_FragColor.g = z;
+  gl_FragColor.b = z;
 
 }
 
@@ -45,16 +56,11 @@ void main(void) {
 </script>
 
 <script src="./webgl.js"></script>
-
 <script>
+'set strict';
 
-function drawScene() {
-  pot += 0.1
-  gl.uniform1f(timeUniform, Math.sin(pot / 64))
-  gl.uniform2f(translateUniform, gl_translate[0], gl_translate[1])
-  gl.uniform2f(scaleUniform, gl_scale[0], gl_scale[1])
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, numVertices)
-  //var e while (e = gl.getError()) console.log('GL error', e)
+window.onload = function() {
+  launchWebGL()
 }
 
 </script>
