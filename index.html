@@ -83,30 +83,49 @@ import {sMouse} from './sMouse.mjs'
 import {sKeys} from './sKeys.mjs'
 
 window.onload = function() {
+  
+  // Keep track of where the mouse was while dragging
+  var mouse_left_drag_last_position = [0, 0]
+  
   var swgl = new sWebGL({
     plugins: {
 
       'mouse': new sMouse({
-        whileDown: {
-          // left-click: Zoom in
-          0: function() {
-            swgl.incrementZoom(1, swgl.plugins.mouse.p)
-          },
-          // right-click: Zoom out
-          2: function() {
-            swgl.incrementZoom(-1)
-          }
-        },
         onDown: {
+          
+          // left-click: Record position for dragging
+          0: function() {
+            mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
+          },
+          
           // middle-click: Reset
           1: function() {
             swgl.zoom = 1 / 128
             swgl.incrementZoom(0)
             swgl.moveToCentre()
           }
+          
+        },
+        whileDown: {
+          
+          // left-click: Drag
+          0: function() {
+            var mouse_delta = [
+              mouse_left_drag_last_position[0] - swgl.plugins.mouse.p[0],
+              mouse_left_drag_last_position[1] - swgl.plugins.mouse.p[1]
+            ]
+            mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
+            swgl.move(-mouse_delta[0], mouse_delta[1])
+          },
+          
+          // right-click: Zoom out
+          2: function() {
+            swgl.incrementZoom(-1)
+          }
+          
         },
         onWheel: function(i) {
-          swgl.incrementZoom(i)
+          swgl.incrementZoom(-i)
         }
       }),
 
