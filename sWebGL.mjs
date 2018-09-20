@@ -170,7 +170,7 @@ export class sWebGL {
     this.plugins = options.hasOwnProperty('plugins') ? options.plugins : {}
 
     // Zoom level
-    this.zoom = 1 / 128
+    this.zoom = 1 / 256
 
     // Linear zoom increment
     this.incrementZoom = function(increment, point) {
@@ -219,7 +219,7 @@ export class sWebGL {
     canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
 
     gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-    gl_scale = [1/128, 1/128]
+    gl_scale[0] = gl_scale[1] = this.zoom
     gl_rotate = -1/8
 
     init()
