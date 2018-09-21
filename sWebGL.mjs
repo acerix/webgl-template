@@ -220,7 +220,7 @@ export class sWebGL {
 
     gl_translate = [-canvas.centre[0], -canvas.centre[1]]
     gl_scale[0] = gl_scale[1] = this.zoom
-    gl_rotate = -1/8
+    //gl_rotate = -1/8
 
     init()
     life(self)
