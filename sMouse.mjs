@@ -23,8 +23,11 @@ export class sMouse {
     // Callbacks for each key called each frame while pressed
     this.whileDown = options.hasOwnProperty('whileDown') ? options.whileDown : []
 
-    // Callback on scroll (wheel/touch)
+    // Callback on scroll (wheel)
     this.onWheel = options.hasOwnProperty('onWheel') ? options.onWheel : null
+
+    // Callback on mobile swipe (touchmove)
+    this.onTouchMove = options.hasOwnProperty('onTouchMove') ? options.onTouchMove : null
 
     // Handle mouse move
     window.onmousemove = function(e) {
@@ -36,7 +39,6 @@ export class sMouse {
         self.p[0] = e.clientX
         self.p[1] = e.clientY
       }
-      console.log(self.p)
     }
 
     // Handle mouse button press/release
@@ -56,12 +58,23 @@ export class sMouse {
     // Handle mouse wheel
     if (this.onWheel !== null) {
       window.onwheel = function(e) {
+        e.preventDefault()
         self.onWheel(e.deltaY)
       }
     }
 
+    // Handle touch screen swipe
+    if (this.onTouchMove !== null) {
+      window.ontouchmove = function(e) {
+        e.preventDefault()
+        self.onTouchMove(e.changedTouches)
+      }
+    }
+
     // Disable context menu on right-click
-    document.oncontextmenu = function() {return false}
+    document.oncontextmenu = function() {
+      return false
+    }
 
   }
 

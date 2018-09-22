@@ -129,6 +129,23 @@ window.onload = function() {
         },
         onWheel: function(i) {
           swgl.incrementZoom(-i)
+        },
+        onTouchMove: function(changedTouches) {
+          var v = [0, 0]
+          for (var i in changedTouches) {
+            if (changedTouches[i].clientX) {
+              v[0] += changedTouches[i].clientX
+              v[1] += changedTouches[i].clientY
+            }
+          }
+          if (changedTouches.length) {
+            v[0] = Math.round(v[0] / changedTouches.length)
+            v[1] = Math.round(v[1] / changedTouches.length)
+          }
+          swgl.move(
+            (swgl.canvas.centre[0] - v[0]) / 32,
+            (swgl.canvas.centre[1] - v[1]) / -32
+          )
         }
       }),
 
