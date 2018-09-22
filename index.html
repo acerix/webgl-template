@@ -105,11 +105,6 @@ window.onload = function() {
             swgl.moveToCentre()
           },
 
-          // right-click: Record position for dragging
-          2: function() {
-            mouse_right_drag_last_position = swgl.plugins.mouse.p.slice(0)
-          },
-
         },
         whileDown: {
 
@@ -125,12 +120,10 @@ window.onload = function() {
 
           // right-click: Move towards drag position
           2: function() {
-            var mouse_delta = [
-              mouse_left_drag_last_position[0] - swgl.plugins.mouse.p[0],
-              mouse_left_drag_last_position[1] - swgl.plugins.mouse.p[1]
-            ]
-            mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
-            swgl.move(-mouse_delta[0], mouse_delta[1])
+            swgl.move(
+              (swgl.canvas.centre[0] - swgl.plugins.mouse.p[0]) / 32,
+              (swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / -32
+            )
           },
 
         },

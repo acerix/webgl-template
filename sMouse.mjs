@@ -28,8 +28,15 @@ export class sMouse {
 
     // Handle mouse move
     window.onmousemove = function(e) {
-      self.p[0] = e.clientX - e.originalTarget.offsetLeft
-      self.p[1] = e.clientY - e.originalTarget.offsetTop
+      if (typeof e.originalTarget.offsetLeft === 'number') {
+        self.p[0] = e.clientX - e.originalTarget.offsetLeft
+        self.p[1] = e.clientY - e.originalTarget.offsetTop
+      }
+      else {
+        self.p[0] = e.clientX
+        self.p[1] = e.clientY
+      }
+      console.log(self.p)
     }
 
     // Handle mouse button press/release

@@ -203,13 +203,16 @@ export class sWebGL {
 
 
 
-
-
     // Create canvas DOM element
     canvas = document.createElement('canvas')
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     document.body.appendChild(canvas)
+
+
+    // @todo move global here
+    this.canvas = canvas
+
 
     gl = canvas.getContext('webgl', {
       alpha: false,
