@@ -27,9 +27,11 @@ export class sKeys {
       if (typeof self.onDown[k] === 'function') {
         self.onDown[k]()
       }
+      /*
       else {
         console.log('Pressed key', k)
       }
+      */
     }
 
     // Handle key up
