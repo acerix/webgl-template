@@ -31,7 +31,7 @@ export class sMouse {
 
     // Handle mouse move
     window.onmousemove = function(e) {
-      if (typeof e.originalTarget.offsetLeft === 'number') {
+      if (e.originalTarget && typeof e.originalTarget.offsetLeft === 'number') {
         self.p[0] = e.clientX - e.originalTarget.offsetLeft
         self.p[1] = e.clientY - e.originalTarget.offsetTop
       }
