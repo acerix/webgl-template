@@ -10,9 +10,6 @@ var canvas
 var gl, program
 var colorLocation
 var squareVerticesColorBuffer
-var gl_translate = [0, 0]
-var gl_scale = [1, 1]
-var gl_rotate = 0
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
 var translateUniform, scaleUniform, rotateUniform
 var rUniform, gUniform, bUniform
@@ -25,13 +22,10 @@ var rand_b = Math.random() / 8;
 var rand_t = Math.random() / 64;
 
 
-
 // Keep track of browser focus to sleep in the background
 var windowFocused = true
 window.onfocus = function() {windowFocused = true}
 window.onblur = function() {windowFocused = false}
-
-
 
 // Draw a frame
 function drawScene(swgl) {
@@ -53,9 +47,9 @@ function drawScene(swgl) {
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
   gl.uniform1f(bUniform, Math.sin(pot * rand_b))
 
-  gl.uniform2f(translateUniform, gl_translate[0], gl_translate[1])
-  gl.uniform2f(scaleUniform, gl_scale[0], gl_scale[1])
-  gl.uniform1f(rotateUniform, 2 * Math.PI * gl_rotate)
+  gl.uniform2f(translateUniform, swgl.params.x, swgl.params.y)
+  gl.uniform2f(scaleUniform, swgl.params.sx, swgl.params.sy)
+  gl.uniform1f(rotateUniform, 2 * Math.PI * swgl.params.r)
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, numVertices)
   //var e while (e = gl.getError()) console.log('GL error', e)
@@ -89,15 +83,6 @@ function life(swgl) {
   window.requestAnimationFrame(callback)
 }
 
-
-// Handle viewport resize
-window.onresize = function() {
-  canvas.width = window.innerWidth
-  canvas.height = window.innerHeight
-  canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
-  gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-  init()
-}
 
 // Load shader from <script>
 function getShader(gl, id) {
@@ -169,39 +154,27 @@ export class sWebGL {
     // Plugins
     this.plugins = options.hasOwnProperty('plugins') ? options.plugins : {}
 
-    // Zoom level
-    this.zoom = 1 / 256
+    // Default parameters
+    this.params = options.hasOwnProperty('params') ? options.params : {
 
-    // Linear zoom increment
-    this.incrementZoom = function(increment, point) {
-      this.zoom *= (1 - increment / 8)
-      gl_scale[0] = gl_scale[1] = this.zoom
-      if (typeof point === 'object') {
-        gl_translate[0] -= (point[0] - canvas.centre[0]) / 128
-        gl_translate[1] -= (point[1] - canvas.centre[1]) / 128
+      // Centre point
+      x: 0,
+      y: 0,
+
+      // Scale of x, y
+      sx: 1/256,
+      sy: 1/256,
+
+      // Rotation (0..1)
+      r: 0.875
+    }
+
+    // Override parameters from params plugin
+    if (typeof this.plugins.params === 'object') {
+      for (var i in this.plugins.params.params) if (i in this.params) {
+        this.params[i] = this.plugins.params.params[i]
       }
     }
-
-    // Linear move increment
-    this.move = function(increment_x, increment_y) {
-      gl_translate[0] -= increment_x
-      gl_translate[1] -= increment_y
-    }
-
-    // Absolute move to position
-    this.moveTo = function(x, y) {
-      gl_translate[0] = x
-      gl_translate[1] = y
-    }
-
-    // Recentre
-    this.moveToCentre = function() {
-      gl_translate[0] = -canvas.centre[0]
-      gl_translate[1] = -canvas.centre[1]
-    }
-
-
-
 
     // Create canvas DOM element
     canvas = document.createElement('canvas')
@@ -221,13 +194,77 @@ export class sWebGL {
 
     canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
 
-    gl_translate = [-canvas.centre[0], -canvas.centre[1]]
-    gl_scale[0] = gl_scale[1] = this.zoom
-    //gl_rotate = -1/8
+    this.params.x = -canvas.centre[0]
+    this.params.y = -canvas.centre[1]
+
+    // Handle viewport resize
+    window.onresize = function() {
+      console.log('onresize')
+      /*
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+      gl_translate = [-canvas.centre[0], -canvas.centre[1]]
+      init()
+      */
+    }
 
     init()
+
+    // Init plugins
+    if (typeof this.plugins === 'object') {
+      for (var i in this.plugins) if (typeof this.plugins[i].init === 'function') {
+        this.plugins[i].init(this)
+      }
+    }
+
     life(self)
 
+  }
+
+  // Call after changing a param
+  updateParams() {
+    if (typeof this.plugins.params === 'object') {
+      this.plugins.params.update()
+    }
+  }
+
+  // Linear zoom increment
+  incrementZoom(increment, towards) {
+    var factor = 1 - increment / 16
+    this.params.sx *= factor
+    this.params.sy *= factor
+
+    // Zoom "towards" this point
+    /*
+    if (typeof towards === 'object') {
+      this.params.x -= (towards[0] - canvas.centre[0]) / 128
+      this.params.y -= (towards[1] - canvas.centre[1]) / 128
+    }
+    */
+
+    this.updateParams()
+  }
+
+  // Linear move increment
+  move(increment_x, increment_y) {
+    this.params.x -= increment_x
+    this.params.y -= increment_y
+    this.updateParams()
+  }
+
+  // Absolute move to position
+  moveTo(x, y) {
+    this.params.x = x
+    this.params.y = y
+    this.updateParams()
+  }
+
+  // Recentre
+  moveToCentre() {
+    this.params.x = 0
+    this.params.y = 0
+    this.updateParams()
   }
 
 }
