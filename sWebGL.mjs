@@ -297,12 +297,13 @@ export class sWebGL {
 
   // Convert x from screen basis to gl basis
   xFromScreenBasis(x) {
-    return -x * this.params.sx
+    return -x
+    //return -x / this.params.sx
   }
 
   // Convert y from screen basis to gl basis
   yFromScreenBasis(y) {
-    return y * this.params.sy
+    return y
   }
 
 }
