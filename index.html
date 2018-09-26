@@ -11,18 +11,33 @@
 
 precision lowp float;
 
+// point in time
 uniform float u_time;
+
+// transform basis
 uniform vec2 translate;
 uniform vec2 scale;
 uniform float rotate;
+
+// @todo convert above 3 to a matrix
+uniform mat2 transform_canvas_to_cartesian;
+
+// @todo put in vec3?
 uniform float r;
 uniform float g;
 uniform float b;
 
+
 void main(void) {
 
-  float x = ( gl_FragCoord.x + translate.x ) * scale.x;
-  float y = ( gl_FragCoord.y + translate.y ) * scale.y; //  + 1.0
+  float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
+  float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
+
+
+
+  // transform fragcoord to cartesian coord
+  // @todo simplify to one matrix
+
 
   float sin_theta = sin(rotate);
   float cos_theta = cos(rotate);
@@ -33,17 +48,21 @@ void main(void) {
   x = x2;
   y = y2;
 
+
+
+
+  // the return value of the function
   float z = 0.0;
 
   // function to calculate z from x and y
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  //z = x * x + y * y; // circle
+  z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
   //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
-  z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
+  //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // animate by varying the result with u_time
   z = z * -u_time;
@@ -67,10 +86,8 @@ attribute vec4 a_color;
 varying vec4 v_color;
 
 void main(void) {
-
   gl_Position = vec4(a_position, 1);
   v_color = a_color;
-
 }
 
 </script>
@@ -87,6 +104,10 @@ window.onload = function() {
 
   // Keep track of where the mouse was while dragging
   var mouse_left_drag_last_position = [0, 0]
+
+  // Keep track of when each button is pressed to determine which button was pressed first
+  var mouse_left_last_click = 0
+  var mouse_right_last_click = 0
 
   var swgl = new sWebGL({
     plugins: {
@@ -107,16 +128,26 @@ window.onload = function() {
       'mouse': new sMouse({
         onDown: {
 
-          // left-click: Record position for dragging
+          // left-click
           0: function() {
+            mouse_left_last_click = + new Date()
+
+            // Record position for dragging
             mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
           },
 
-          // middle-click: Reset
+          // middle-click
           1: function() {
-            swgl.params.sx = swgl.params.sy = 1/256
-            swgl.incrementZoom(0)
-            swgl.moveToCentre()
+            // Reset view
+            swgl.params.x = swgl.params.y = 0
+            swgl.params.sx = swgl.params.sy = 1
+            swgl.params.r = 0
+            swgl.updateParams()
+          },
+
+          // right-click
+          2: function() {
+            mouse_right_last_click = + new Date()
           },
 
         },
@@ -132,16 +163,29 @@ window.onload = function() {
                 mouse_left_drag_last_position[1] - swgl.plugins.mouse.p[1]
               ]
               mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
-              swgl.move(-mouse_delta[0], mouse_delta[1])
+              swgl.move(
+                swgl.xFromScreenBasis(mouse_delta[0]),
+                swgl.yFromScreenBasis(mouse_delta[1])
+              )
             }
             else {
               // Rotate
-              swgl.rotate(0.01)
+              if (mouse_left_last_click > mouse_right_last_click) {
+                swgl.rotate(0.001)
+              }
+              else {
+                swgl.rotate(-0.001)
+              }
             }
           },
 
-          // right-click: Move towards drag position
+          // right-click
           2: function() {
+            // ignore when left-click is also pressed
+            if (swgl.plugins.mouse.b[0] !== 0) {
+              return
+            }
+            // move towards drag position
             swgl.move(
               (swgl.canvas.centre[0] - swgl.plugins.mouse.p[0]) / 32,
               (swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / -32

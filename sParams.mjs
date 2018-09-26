@@ -5,12 +5,12 @@
 export class sParams {
 
   constructor(options) {
-  
+
     var self = this
- 
+
     // Parameter values
     this.params = {}
-    
+
     // Callbacks for each param when changed
     this.onChange = options.hasOwnProperty('onChange') ? options.onChange : {}
 
@@ -21,15 +21,15 @@ export class sParams {
 
     // Parse on init
     this.parse(false)
-    
+
   }
 
   // Called with the top level object (sWebGL) after it has been initialized
   init(swgl) {
-    
+
     // Reference main params
     this.params = swgl.params
-    
+
     // Update URL hash on init
     this.update()
   }
@@ -43,13 +43,16 @@ export class sParams {
   parse(runCallbacks) {
     var new_params = this._unserialize( window.location.hash.substr(1) )
     for (var i in new_params) {
-      this.params[i] = new_params[i]
+
+      // Only allow numbers, convert to int if whole otherwise float
+      this.params[i] = new_params[i] % 1 === 0 ? parseInt(new_params[i], 10) : parseFloat(new_params[i])
+
       if (runCallbacks && i in this.onChange) {
         this.onChange[i](this.params[i])
       }
     }
   }
-  
+
   // Serialize params into a string
   // jquery-param (c) 2015 KNOWLEDGECODE | MIT
   _serialize(a) {

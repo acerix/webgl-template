@@ -11,15 +11,15 @@ var gl, program
 var colorLocation
 var squareVerticesColorBuffer
 var shaderProgram, positionAttr, timeUniform, mxUniform, myUniform, vertices, positionBuffer, numVertices
-var translateUniform, scaleUniform, rotateUniform
+var translateUniform, scaleUniform, rotateUniform, defragUniform
 var rUniform, gUniform, bUniform
 var pot = 0
 
 // random values
-var rand_r = Math.random() / 8;
-var rand_g = Math.random() / 8;
-var rand_b = Math.random() / 8;
-var rand_t = Math.random() / 64;
+var rand_r = Math.random() / 8
+var rand_g = Math.random() / 8
+var rand_b = Math.random() / 8
+var rand_t = Math.random() / 64
 
 
 // Keep track of browser focus to sleep in the background
@@ -47,9 +47,32 @@ function drawScene(swgl) {
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
   gl.uniform1f(bUniform, Math.sin(pot * rand_b))
 
-  gl.uniform2f(translateUniform, swgl.params.x - canvas.centre[0], swgl.params.y - canvas.centre[1])
-  gl.uniform2f(scaleUniform, swgl.params.sx, swgl.params.sy)
-  gl.uniform1f(rotateUniform, 2 * Math.PI * swgl.params.r)
+  gl.uniform2f(
+    translateUniform,
+    swgl.params.x - canvas.centre[0] * swgl.params.sx,
+    swgl.params.y - canvas.centre[1] * swgl.params.sy
+    // swgl.params.x,
+    // swgl.params.y
+  )
+
+  gl.uniform2f(
+    scaleUniform,
+    swgl.params.sx,
+    swgl.params.sy
+  )
+
+  gl.uniform1f(
+    rotateUniform,
+    2 * Math.PI * swgl.params.r
+  )
+
+  gl.uniform4f(
+    defragUniform,
+    0,
+    0,
+    0,
+    0
+  )
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, numVertices)
   //var e while (e = gl.getError()) console.log('GL error', e)
@@ -115,6 +138,7 @@ function initShaders() {
   translateUniform = gl.getUniformLocation(shaderProgram, 'translate')
   scaleUniform = gl.getUniformLocation(shaderProgram, 'scale')
   rotateUniform = gl.getUniformLocation(shaderProgram, 'rotate')
+  defragUniform = gl.getUniformLocation(shaderProgram, 'defrag')
 
   rUniform = gl.getUniformLocation(shaderProgram, 'r')
   gUniform = gl.getUniformLocation(shaderProgram, 'g')
@@ -159,14 +183,14 @@ export class sWebGL {
 
       // Centre point
       x: 0,
-      y: 1,
+      y: 0,
 
       // Scale of x, y
-      sx: 1/256,
-      sy: 1/256,
+      sx: 1,
+      sy: 1,
 
       // Rotation (0..1)
-      r: 0.875
+      r: 0 // 7/8 for fermat curve
     }
 
     // Override parameters from params plugin
@@ -186,13 +210,15 @@ export class sWebGL {
     // @todo move global here
     this.canvas = canvas
 
-
     gl = canvas.getContext('webgl', {
       alpha: false,
       preserveDrawingBuffer: true
     })
 
-    canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+    canvas.centre = [
+      Math.floor(canvas.width/2),
+      Math.floor(canvas.height/2)
+    ]
 
     // this.params.x = -canvas.centre[0]
     // this.params.y = -canvas.centre[1]
@@ -265,9 +291,18 @@ export class sWebGL {
 
   // Rotate by increment
   rotate(increment) {
-    // @todo wtf is r a string?
-    this.params.r += parseFloat(this.params.r) + increment
+    this.params.r = parseFloat(this.params.r) + increment
     this.updateParams()
+  }
+
+  // Convert x from screen basis to gl basis
+  xFromScreenBasis(x) {
+    return -x * this.params.sx
+  }
+
+  // Convert y from screen basis to gl basis
+  yFromScreenBasis(y) {
+    return y * this.params.sy
   }
 
 }
