@@ -21,7 +21,6 @@ var rand_g = Math.random() / 8
 var rand_b = Math.random() / 8
 var rand_t = Math.random() / 64
 
-
 // Keep track of browser focus to sleep in the background
 var windowFocused = true
 window.onfocus = function() {windowFocused = true}
@@ -47,12 +46,15 @@ function drawScene(swgl) {
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
   gl.uniform1f(bUniform, Math.sin(pot * rand_b))
 
+  // change of basis
   gl.uniform2f(
     translateUniform,
-    swgl.params.x - canvas.centre[0] * swgl.params.sx,
-    swgl.params.y - canvas.centre[1] * swgl.params.sy
+    //swgl.params.x - canvas.centre[0] * swgl.params.sx,
+    //swgl.params.y - canvas.centre[1] * swgl.params.sy
     // swgl.params.x,
     // swgl.params.y
+    swgl.xFromScreenBasis(swgl.params.x),
+    swgl.yFromScreenBasis(swgl.params.y)
   )
 
   gl.uniform2f(
@@ -190,7 +192,7 @@ export class sWebGL {
       sy: 1,
 
       // Rotation (0..1)
-      r: 0 // 7/8 for fermat curve
+      r: 0 // 7/8 is good for fermat curve
     }
 
     // Override parameters from params plugin
@@ -219,9 +221,6 @@ export class sWebGL {
       Math.floor(canvas.width/2),
       Math.floor(canvas.height/2)
     ]
-
-    // this.params.x = -canvas.centre[0]
-    // this.params.y = -canvas.centre[1]
 
     // Handle viewport resize
     window.onresize = function() {
@@ -295,15 +294,31 @@ export class sWebGL {
     this.updateParams()
   }
 
+  // Return the height of the screen or width if smaller
+  smallestScreenEdge() {
+    return Math.min(this.canvas.height, this.canvas.width)
+  } 
+
   // Convert x from screen basis to gl basis
   xFromScreenBasis(x) {
-    return -x
-    //return -x / this.params.sx
+    //return (x - this.canvas.centre[0]) / this.smallestScreenEdge() / 2 * this.params.sx
+    return (x - this.canvas.centre[0]) * this.params.sx
   }
 
   // Convert y from screen basis to gl basis
   yFromScreenBasis(y) {
-    return y
+    //return (y - this.canvas.centre[1]) / this.smallestScreenEdge() / 2 * this.params.sy
+    return (y - this.canvas.centre[1]) * this.params.sy
+  }
+
+  // Convert x to screen basis from gl basis
+  xToScreenBasis(x) {
+    return x / this.params.sx + this.canvas.centre[0]
+  }
+
+  // Convert y to screen basis from gl basis
+  yToScreenBasis(y) {
+    return y / this.params.sy + this.canvas.centre[1]
   }
 
 }
