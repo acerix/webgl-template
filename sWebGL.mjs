@@ -47,7 +47,7 @@ function drawScene(swgl) {
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
   gl.uniform1f(bUniform, Math.sin(pot * rand_b))
 
-  gl.uniform2f(translateUniform, swgl.params.x, swgl.params.y)
+  gl.uniform2f(translateUniform, swgl.params.x - canvas.centre[0], swgl.params.y - canvas.centre[1])
   gl.uniform2f(scaleUniform, swgl.params.sx, swgl.params.sy)
   gl.uniform1f(rotateUniform, 2 * Math.PI * swgl.params.r)
 
@@ -159,7 +159,7 @@ export class sWebGL {
 
       // Centre point
       x: 0,
-      y: 0,
+      y: 1,
 
       // Scale of x, y
       sx: 1/256,
@@ -194,19 +194,15 @@ export class sWebGL {
 
     canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
 
-    this.params.x = -canvas.centre[0]
-    this.params.y = -canvas.centre[1]
+    // this.params.x = -canvas.centre[0]
+    // this.params.y = -canvas.centre[1]
 
     // Handle viewport resize
     window.onresize = function() {
-      console.log('onresize')
-      /*
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
-      gl_translate = [-canvas.centre[0], -canvas.centre[1]]
       init()
-      */
     }
 
     init()
@@ -264,6 +260,13 @@ export class sWebGL {
   moveToCentre() {
     this.params.x = 0
     this.params.y = 0
+    this.updateParams()
+  }
+
+  // Rotate by increment
+  rotate(increment) {
+    // @todo wtf is r a string?
+    this.params.r += parseFloat(this.params.r) + increment
     this.updateParams()
   }
 
