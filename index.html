@@ -267,7 +267,7 @@ window.onload = function() {
               var tilt_delta = tilt - touchmove_drag_last_tilt
 
               swgl.incrementZoom(distance_delta)
-              swgl.rotate(tilt_delta)
+              // swgl.rotate(tilt_delta) // broken?
 
               //console.log('d', distance_delta)
               //console.log('t', tilt_delta)
