@@ -27,7 +27,6 @@ uniform float r;
 uniform float g;
 uniform float b;
 
-
 void main(void) {
 
   float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
@@ -57,9 +56,9 @@ void main(void) {
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  z = x * x + y * y; // circle
+  //z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
-  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
@@ -107,6 +106,14 @@ window.onload = function() {
   // Keep track of when each button is pressed to determine which button was pressed first
   var mouse_left_last_click = 0
   var mouse_right_last_click = 0
+
+  // Keep track of where the last touch move was
+  var touchmove_drag_last_position = [0, 0]
+
+  // Keep track of last squared distance and orientation between two touches
+  var touchmove_drag_last_quadrance = 0
+  var touchmove_drag_last_tilt = 0
+
 
   var swgl = new sWebGL({
     plugins: {
@@ -197,22 +204,87 @@ window.onload = function() {
         onWheel: function(i) {
           swgl.incrementZoom(-i)
         },
+        onTouchStart: function(changedTouches) {
+            touchmove_drag_last_position = [changedTouches[0].clientX, changedTouches[0].clientY]
+            touchmove_drag_last_quadrance = null
+        },
         onTouchMove: function(changedTouches) {
-          var v = [0, 0]
-          for (var i in changedTouches) {
-            if (changedTouches[i].clientX) {
-              v[0] += changedTouches[i].clientX
-              v[1] += changedTouches[i].clientY
+
+          // 1 touch: Drag screen around
+          if (changedTouches.length === 1) {
+
+            var delta = [
+              swgl.xToScreenBasis(touchmove_drag_last_position[0]) - swgl.xToScreenBasis(changedTouches[0].clientX),
+              swgl.yToScreenBasis(touchmove_drag_last_position[1]) - swgl.yToScreenBasis(changedTouches[0].clientY)
+            ]
+            touchmove_drag_last_position = [changedTouches[0].clientX, changedTouches[0].clientY]
+
+            swgl.move(
+              -delta[0],
+              delta[1]
+            )
+
+          }
+
+          // 2 touches: Zoom/Rotate
+          else if (changedTouches.length === 2) {
+
+            // the squared distance between the 2 touches
+            var quadrance =
+              Math.pow(swgl.xFromScreenBasis(changedTouches[0].clientX) - swgl.xFromScreenBasis(changedTouches[1].clientX), 2) +
+              Math.pow(swgl.yFromScreenBasis(changedTouches[0].clientY) - swgl.yFromScreenBasis(changedTouches[1].clientY), 2)
+
+            // the "angle" of the line between the 2 touches, with 0 being horizontal and 0.5 being vertical, 0.25 being a slope from top left to bottom right
+
+            var horizontal_vector = [1, 0]
+            var tilt_vector = [
+              swgl.xFromScreenBasis(changedTouches[0].clientX) - swgl.xFromScreenBasis(changedTouches[1].clientX),
+              swgl.yFromScreenBasis(changedTouches[0].clientY) - swgl.yFromScreenBasis(changedTouches[1].clientY)
+            ]
+
+            var tilt =
+              Math.acos(
+                (
+                  tilt_vector[0] * horizontal_vector[0] +
+                  tilt_vector[1] * horizontal_vector[1]
+                ) /
+                (
+                  Math.sqrt(
+                    Math.pow(tilt_vector[0], 2) +
+                    Math.pow(tilt_vector[1], 2)
+                  ) +
+                  Math.sqrt(
+                    Math.pow(horizontal_vector[0], 2) +
+                    Math.pow(horizontal_vector[1], 2)
+                  )
+                )
+              )
+
+            // ignore first move when when don't know the previous distance
+            if (touchmove_drag_last_quadrance !== null) {
+
+              var distance_delta = Math.sqrt(quadrance) - Math.sqrt(touchmove_drag_last_quadrance)
+              var tilt_delta = tilt - touchmove_drag_last_tilt
+
+              swgl.incrementZoom(distance_delta)
+              swgl.rotate(tilt_delta)
+
+              //console.log('d', distance_delta)
+              //console.log('t', tilt_delta)
+
             }
+
+            // remember for next move
+            touchmove_drag_last_quadrance = quadrance
+            touchmove_drag_last_tilt = tilt
+
           }
-          if (changedTouches.length) {
-            v[0] = Math.round(v[0] / changedTouches.length)
-            v[1] = Math.round(v[1] / changedTouches.length)
+
+          // 3 touches: why?
+          if (changedTouches.length === 3) {
+            console.log('2 in the pink, 1 in the stink')
           }
-          swgl.move(
-            (swgl.canvas.centre[0] - v[0]) / 32,
-            (swgl.canvas.centre[1] - v[1]) / -32
-          )
+
         }
       }),
 

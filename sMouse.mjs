@@ -27,6 +27,7 @@ export class sMouse {
     this.onWheel = options.hasOwnProperty('onWheel') ? options.onWheel : null
 
     // Callback on mobile swipe (touchmove)
+    this.onTouchStart = options.hasOwnProperty('onTouchStart') ? options.onTouchStart : null
     this.onTouchMove = options.hasOwnProperty('onTouchMove') ? options.onTouchMove : null
 
     // Handle mouse move
@@ -63,7 +64,15 @@ export class sMouse {
       }
     }
 
-    // Handle touch screen swipe
+    // Handle touch screen start
+    if (this.onTouchStart !== null) {
+      window.ontouchstart = function(e) {
+        e.preventDefault()
+        self.onTouchStart(e.changedTouches)
+      }
+    }
+
+    // Handle touch screen move
     if (this.onTouchMove !== null) {
       window.ontouchmove = function(e) {
         e.preventDefault()

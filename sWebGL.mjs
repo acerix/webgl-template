@@ -49,10 +49,6 @@ function drawScene(swgl) {
   // change of basis
   gl.uniform2f(
     translateUniform,
-    //swgl.params.x - canvas.centre[0] * swgl.params.sx,
-    //swgl.params.y - canvas.centre[1] * swgl.params.sy
-    // swgl.params.x,
-    // swgl.params.y
     swgl.xFromScreenBasis(swgl.params.x),
     swgl.yFromScreenBasis(swgl.params.y)
   )
@@ -188,8 +184,8 @@ export class sWebGL {
       y: 0,
 
       // Scale of x, y
-      sx: 1,
-      sy: 1,
+      sx: 64,
+      sy: 64,
 
       // Rotation (0..1)
       r: 0 // 7/8 is good for fermat curve
@@ -297,28 +293,29 @@ export class sWebGL {
   // Return the height of the screen or width if smaller
   smallestScreenEdge() {
     return Math.min(this.canvas.height, this.canvas.width)
-  } 
+  }
 
   // Convert x from screen basis to gl basis
   xFromScreenBasis(x) {
     //return (x - this.canvas.centre[0]) / this.smallestScreenEdge() / 2 * this.params.sx
-    return (x - this.canvas.centre[0]) * this.params.sx
+    return (x - this.canvas.centre[0])
   }
 
   // Convert y from screen basis to gl basis
   yFromScreenBasis(y) {
     //return (y - this.canvas.centre[1]) / this.smallestScreenEdge() / 2 * this.params.sy
-    return (y - this.canvas.centre[1]) * this.params.sy
+    return (y - this.canvas.centre[1])
   }
 
   // Convert x to screen basis from gl basis
   xToScreenBasis(x) {
-    return x / this.params.sx + this.canvas.centre[0]
+    return x + this.canvas.centre[0]
   }
 
   // Convert y to screen basis from gl basis
   yToScreenBasis(y) {
-    return y / this.params.sy + this.canvas.centre[1]
+    return y + this.canvas.centre[1]
   }
 
 }
+
