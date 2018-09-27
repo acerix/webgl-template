@@ -184,11 +184,11 @@ export class sWebGL {
       y: 0,
 
       // Scale of x, y
-      sx: 64,
-      sy: 64,
+      sx: 1,
+      sy: 1,
 
       // Rotation (0..1)
-      r: 0 // 7/8 is good for fermat curve
+      r: 7/8 // 7/8 is good for fermat curve
     }
 
     // Override parameters from params plugin
