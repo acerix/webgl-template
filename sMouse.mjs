@@ -60,8 +60,8 @@ export class sMouse {
     if (this.onWheel !== null) {
       window.onwheel = function(e) {
         e.preventDefault()
-        self.onWheel(e.deltaY)
-        console.log(e.deltaY)
+        // firefox gives a delta of 3 but chome is 53... so normalize to 1
+        self.onWheel(e.deltaY > 0 ? 1 : -1)
       }
     }
 
