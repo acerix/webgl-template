@@ -204,7 +204,7 @@ window.onload = function() {
 
         },
         onWheel: function(i) {
-          swgl.incrementZoom(-i)
+          swgl.incrementZoom(-i, swgl.plugins.mouse.p)
         },
         onTouchStart: function(changedTouches) {
             touchmove_drag_last_position = [changedTouches[0].clientX, changedTouches[0].clientY]

@@ -42,9 +42,9 @@ function drawScene(swgl) {
 
   gl.uniform1f(timeUniform, pot)
 
-  gl.uniform1f(rUniform, Math.sin(pot * rand_r))
+  gl.uniform1f(rUniform, Math.cos(pot * rand_r))
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
-  gl.uniform1f(bUniform, Math.sin(pot * rand_b))
+  gl.uniform1f(bUniform, Math.cos(pot * rand_b))
 
   // change of basis
   gl.uniform2f(
@@ -252,12 +252,10 @@ export class sWebGL {
     this.params.sy *= factor
 
     // Zoom "towards" this point
-    /*
     if (typeof towards === 'object') {
       this.params.x -= (towards[0] - canvas.centre[0]) / 128
       this.params.y -= (towards[1] - canvas.centre[1]) / 128
     }
-    */
 
     this.updateParams()
   }
