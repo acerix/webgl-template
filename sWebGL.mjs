@@ -16,10 +16,10 @@ var rUniform, gUniform, bUniform
 var pot = 0
 
 // random values
-var rand_r = Math.random() / 8
-var rand_g = Math.random() / 8
-var rand_b = Math.random() / 8
-var rand_t = Math.random() / 64
+var rand_r = Math.random() / 256
+var rand_g = Math.random() / 256
+var rand_b = Math.random() / 256
+var rand_t = Math.random() / 16
 
 // Keep track of browser focus to sleep in the background
 var windowFocused = true
@@ -40,7 +40,7 @@ function drawScene(swgl) {
     }
   }
 
-  gl.uniform1f(timeUniform, Math.sin(pot * rand_t) / 2 + 1)
+  gl.uniform1f(timeUniform, pot)
 
   gl.uniform1f(rUniform, Math.sin(pot * rand_r))
   gl.uniform1f(gUniform, Math.sin(pot * rand_g))
@@ -188,7 +188,7 @@ export class sWebGL {
       sy: 1,
 
       // Rotation (0..1)
-      r: 7/8 // 7/8 is good for fermat curve
+      r: 0 // 7/8 is good for fermat curve
     }
 
     // Override parameters from params plugin
