@@ -200,33 +200,32 @@ export class sWebGL {
 
     // Create canvas DOM element
     canvas = document.createElement('canvas')
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
     document.body.appendChild(canvas)
-
 
     // @todo move global here
     this.canvas = canvas
 
+    // Init canvas
     gl = canvas.getContext('webgl', {
       alpha: false,
       preserveDrawingBuffer: true
     })
 
-    canvas.centre = [
-      Math.floor(canvas.width/2),
-      Math.floor(canvas.height/2)
-    ]
-
     // Handle viewport resize
     window.onresize = function() {
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
-      canvas.centre = [Math.floor(canvas.width/2), Math.floor(canvas.height/2)]
+      //canvas.style.width = window.innerWidth + 'px'
+      //canvas.style.height = window.innerHeight + 'px'
+      canvas.centre = [
+        Math.floor(canvas.width/2),
+        Math.floor(canvas.height/2)
+      ]
       init()
     }
 
-    init()
+    // Trigger resize on init
+    window.onresize()
 
     // Init plugins
     if (typeof this.plugins === 'object') {
