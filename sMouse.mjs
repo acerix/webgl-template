@@ -59,9 +59,9 @@ export class sMouse {
     // Handle mouse wheel
     if (this.onWheel !== null) {
       window.onwheel = function(e) {
-        console.log(e)
         e.preventDefault()
         self.onWheel(e.deltaY)
+        console.log(e.deltaY)
       }
     }
 
