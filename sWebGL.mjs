@@ -251,7 +251,10 @@ export class sWebGL {
     this.params.sx *= factor
     this.params.sy *= factor
 
-    // Zoom "towards" this point
+    console.log(towards)
+
+    // Zoom "towards", or back from, this point
+    // ie. This point should not move
     if (typeof towards === 'object') {
       this.params.x -= (towards[0] - canvas.centre[0]) / 128
       this.params.y -= (towards[1] - canvas.centre[1]) / 128
@@ -294,24 +297,24 @@ export class sWebGL {
 
   // Convert x from screen basis to gl basis
   xFromScreenBasis(x) {
-    //return (x - this.canvas.centre[0]) / this.smallestScreenEdge() / 2 * this.params.sx
-    return (x - this.canvas.centre[0])
+    return x / this.params.sx * this.smallestScreenEdge() - this.canvas.centre[0]
   }
 
   // Convert y from screen basis to gl basis
   yFromScreenBasis(y) {
-    //return (y - this.canvas.centre[1]) / this.smallestScreenEdge() / 2 * this.params.sy
-    return (y - this.canvas.centre[1])
+    return y / this.params.sy * this.smallestScreenEdge() - this.canvas.centre[1]
   }
 
   // Convert x to screen basis from gl basis
   xToScreenBasis(x) {
-    return x + this.canvas.centre[0]
+    //return x + this.canvas.centre[0]
+    return (x + this.canvas.centre[0]) / this.smallestScreenEdge() * this.params.sx
   }
 
   // Convert y to screen basis from gl basis
   yToScreenBasis(y) {
-    return y + this.canvas.centre[1]
+    //return y + this.canvas.centre[1]
+    return (y + this.canvas.centre[1]) / this.smallestScreenEdge() * this.params.sy
   }
 
 }

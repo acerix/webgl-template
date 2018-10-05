@@ -67,13 +67,13 @@ void main(void) {
 
 
   // grey
-  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
-  gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
+  gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
+  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
 
   // set pixel colours
-  gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
-  gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
-  gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
+  //gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
+  //gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
+  //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
 
 }
 
@@ -197,8 +197,8 @@ window.onload = function() {
             }
             // move towards drag position
             swgl.move(
-              (swgl.canvas.centre[0] - swgl.plugins.mouse.p[0]) / 32,
-              (swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / -32
+              (swgl.canvas.centre[0] - swgl.plugins.mouse.p[0]) / 4096,
+              -(swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / 4096
             )
           },
 
@@ -267,8 +267,12 @@ window.onload = function() {
 
               var distance_delta = Math.sqrt(quadrance) - Math.sqrt(touchmove_drag_last_quadrance)
               var tilt_delta = tilt - touchmove_drag_last_tilt
+              var zoom_towards = [
+                (changedTouches[0].clientX + changedTouches[1].clientX) / 2,
+                (changedTouches[0].clientY + changedTouches[1].clientY) / 2
+              ]
 
-              swgl.incrementZoom(distance_delta)
+              swgl.incrementZoom(distance_delta, zoom_towards) // not tested ;)
               // swgl.rotate(tilt_delta) // broken?
 
               //console.log('d', distance_delta)

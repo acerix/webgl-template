@@ -20,7 +20,7 @@ export class sParams {
     }
 
     // Parse on init
-    this.parse(false)
+    //this.parse(false)
 
   }
 
