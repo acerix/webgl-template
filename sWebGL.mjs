@@ -256,8 +256,8 @@ export class sWebGL {
     // Zoom "towards", or back from, this point
     // ie. This point should not move
     if (typeof towards === 'object') {
-      this.params.x -= (towards[0] - canvas.centre[0]) / 128
-      this.params.y -= (towards[1] - canvas.centre[1]) / 128
+      //this.params.x -= (towards[0] - canvas.centre[0]) / 128
+      //this.params.y -= (towards[1] - canvas.centre[1]) / 128
     }
 
     this.updateParams()
