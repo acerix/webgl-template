@@ -62,18 +62,18 @@ void main(void) {
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // animate by varying the result with u_time
-  //z = z * -u_time;
+  z = z * -u_time;
   //z = z + u_time;
 
 
   // grey
-  gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
+  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
   //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
 
   // set pixel colours
-  //gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
-  //gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
-  //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
+  gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
+  gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
+  gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
 
 }
 
