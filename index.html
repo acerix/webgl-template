@@ -67,13 +67,13 @@ void main(void) {
 
 
   // grey
-  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
+    gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
   //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
 
   // set pixel colours
-  gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
-  gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
-  gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
+  //gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
+  //gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
+  //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
 
 }
 
@@ -231,17 +231,24 @@ window.onload = function() {
           // 2 touches: Zoom/Rotate
           else if (changedTouches.length === 2) {
 
+            //
+            var touch_1 = [changedTouches[0].clientX, changedTouches[0].clientY]
+            var touch_2 = [changedTouches[1].clientX, changedTouches[1].clientY]
+            //var touch_2 = [swgl.canvas.centre[0], swgl.canvas.centre[1]] // for testing with only 1 touch
+
+            //console.log(touch_1, touch_2)
+
             // the squared distance between the 2 touches
             var quadrance =
-              Math.pow(swgl.xFromScreenBasis(changedTouches[0].clientX) - swgl.xFromScreenBasis(changedTouches[1].clientX), 2) +
-              Math.pow(swgl.yFromScreenBasis(changedTouches[0].clientY) - swgl.yFromScreenBasis(changedTouches[1].clientY), 2)
+              Math.pow(touch_1[0] - touch_2[0], 2) +
+              Math.pow(touch_1[1] - touch_2[1], 2)
 
             // the "angle" of the line between the 2 touches, with 0 being horizontal and 0.5 being vertical, 0.25 being a slope from top left to bottom right
 
             var horizontal_vector = [1, 0]
             var tilt_vector = [
-              swgl.xFromScreenBasis(changedTouches[0].clientX) - swgl.xFromScreenBasis(changedTouches[1].clientX),
-              swgl.yFromScreenBasis(changedTouches[0].clientY) - swgl.yFromScreenBasis(changedTouches[1].clientY)
+              swgl.xFromScreenBasis(touch_1[0]) - swgl.xFromScreenBasis(touch_2[0]),
+              swgl.yFromScreenBasis(touch_1[1]) - swgl.yFromScreenBasis(touch_2[1])
             ]
 
             var tilt =
@@ -268,12 +275,18 @@ window.onload = function() {
               var distance_delta = Math.sqrt(quadrance) - Math.sqrt(touchmove_drag_last_quadrance)
               var tilt_delta = tilt - touchmove_drag_last_tilt
               var zoom_towards = [
-                (changedTouches[0].clientX + changedTouches[1].clientX) / 2,
-                (changedTouches[0].clientY + changedTouches[1].clientY) / 2
+                (touch_1[0] + touch_2[0]) / 2,
+                (touch_1[1] + touch_2[1]) / 2
               ]
 
-              swgl.incrementZoom(distance_delta, zoom_towards) // not tested ;)
-              // swgl.rotate(tilt_delta) // broken?
+              // @hack if touch 1 is higher than touch 2, reverse the rotate direction
+              // @todo replace acos as a better fix
+              if (touch_1[1] < touch_2[1]) {
+                tilt_delta = -tilt_delta
+              }
+
+              swgl.incrementZoom(distance_delta / 8, zoom_towards)
+              swgl.rotate(tilt_delta / 8) // broken?
 
               //console.log('d', distance_delta)
               //console.log('t', tilt_delta)

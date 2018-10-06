@@ -251,7 +251,7 @@ export class sWebGL {
     this.params.sx *= factor
     this.params.sy *= factor
 
-    console.log(towards)
+    //console.log(towards)
 
     // Zoom "towards", or back from, this point
     // ie. This point should not move
