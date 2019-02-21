@@ -173,6 +173,10 @@ export class sWebGL {
 
     var self = this
 
+    if (typeof options === 'undefined') {
+      options = {}
+    }
+
     // Plugins
     this.plugins = options.hasOwnProperty('plugins') ? options.plugins : {}
 

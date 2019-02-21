@@ -4,9 +4,15 @@
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
 <title>WebGL App</title>
+<style>
+body {
+  overflow:hidden;
+  margin:0;
+  background-color:#888;
+}
+</style>
 </head>
-<body style='overflow:hidden;margin:0;background-color:#888'>
-
+<body>
 <script id='shader-fs' type='text/x-fragment_shader'>
 
 precision lowp float;
@@ -97,6 +103,7 @@ void main(void) {
 
 import {sWebGL} from './sWebGL.mjs'
 import {sParams} from './sParams.mjs'
+import {sPanel} from './sPanel.mjs'
 import {sMouse} from './sMouse.mjs'
 import {sKeys} from './sKeys.mjs'
 
@@ -131,6 +138,9 @@ window.onload = function() {
 
         },
         */
+      }),
+
+      'panel': new sPanel({
       }),
 
       'mouse': new sMouse({
