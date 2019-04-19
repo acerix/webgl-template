@@ -1,0 +1,58 @@
+
+/* Global */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: 'Linux Biolinum', 'Helvetica Neue', helvetica, arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 400;
+  background-color: #000;
+  color: #0c0;
+  overflow: hidden;
+}
+a {
+  color: #ccf;
+  text-decoration: underline;
+  cursor: pointer;
+}
+a:hover {
+  color: #99f;
+}
+
+/* sPanel */
+.panel {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+.panel table {
+  font-family: monospace;
+  text-align: right;
+  line-height: 1;
+}
+.panel input[type=number] {
+  width: 80px;
+}
+.panel input[type=range] {
+  width: 420px;
+}
+.panel .buttons {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+}
+.panel .buttons > a {
+  display: block;
+}

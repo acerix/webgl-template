@@ -8,6 +8,8 @@ export class sKeys {
 
     var self = this
 
+    if (typeof options ==='undefined') options = {}
+
     // Button states, 0 or 1 when down
     this.b = Array.from(Array(256), () => 0)
 
@@ -27,11 +29,6 @@ export class sKeys {
       if (typeof self.onDown[k] === 'function') {
         self.onDown[k]()
       }
-      /*
-      else {
-        console.log('Pressed key', k)
-      }
-      */
     }
 
     // Handle key up

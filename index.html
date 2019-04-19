@@ -3,16 +3,12 @@
 <head>
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
-<title>WebGL App</title>
-<style>
-body {
-  overflow:hidden;
-  margin:0;
-  background-color:#888;
-}
-</style>
+<title>sWebGL</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
+
 <script id='shader-fs' type='text/x-fragment_shader'>
 
 precision lowp float;
@@ -33,25 +29,24 @@ uniform float r;
 uniform float g;
 uniform float b;
 
-void main(void) {
+uniform vec4 u_color;
+
+void main() {
 
   float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
   float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
 
-
-
   // transform fragcoord to cartesian coord
   // @todo simplify to one matrix
 
+  //float sin_theta = sin(rotate);
+  //float cos_theta = cos(rotate);
 
-  float sin_theta = sin(rotate);
-  float cos_theta = cos(rotate);
+  //float x2 = cos_theta * x - sin_theta * y;
+  //float y2 = sin_theta * x + cos_theta * y;
 
-  float x2 = cos_theta * x - sin_theta * y;
-  float y2 = sin_theta * x + cos_theta * y;
-
-  x = x2;
-  y = y2;
+  //x = x2;
+  //y = y2;
 
 
   // the return value of the function
@@ -61,19 +56,19 @@ void main(void) {
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  //z = x * x + y * y; // circle
+  z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
-  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // animate by varying the result with u_time
-  z = z * -u_time;
+  //z = z * -u_time;
   //z = z + u_time;
 
 
   // grey
-    gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
+  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
   //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
 
   // set pixel colours
@@ -81,22 +76,44 @@ void main(void) {
   //gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
   //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
 
+
+
+  //gl_FragColor = u_color;
+
+  gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+
 }
 
 </script>
 
 <script id='shader-vs' type='text/x-vertex_shader'>
 
-attribute vec3 a_position;
-attribute vec4 a_color;
-varying vec4 v_color;
+attribute vec2 a_position;
 
-void main(void) {
-  gl_Position = vec4(a_position, 1);
-  v_color = a_color;
+uniform float u_scale;
+
+uniform vec2 u_transform;
+
+uniform vec2 u_resolution;
+
+void main() {
+
+  // convert from pixels to 0...1
+  vec2 clip_space = a_position / u_resolution;
+
+  // scale
+  clip_space *= u_resolution.y * u_scale;
+
+  // translate
+  clip_space += u_transform;
+
+  gl_Position = vec4(clip_space, 0.0, 1.0);
+
 }
 
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
 
 <script type="module">
 'set strict'
@@ -107,6 +124,9 @@ import {sPanel} from './sPanel.mjs'
 import {sMouse} from './sMouse.mjs'
 import {sKeys} from './sKeys.mjs'
 
+import {sDemo} from './sDemo.mjs'
+
+
 window.onload = function() {
 
   // Keep track of where the mouse was while dragging
@@ -116,56 +136,48 @@ window.onload = function() {
   var mouse_left_last_click = 0
   var mouse_right_last_click = 0
 
-  // Keep track of where the last touch move was
-  var touchmove_drag_last_position = [0, 0]
 
-  // Keep track of last squared distance and orientation between two touches
-  var touchmove_drag_last_quadrance = 0
-  var touchmove_drag_last_tilt = 0
+  // Increment the zoom level (scale)
+  var incrementZoom = function(increment, towards) {
+    param_handler.params.z = ((1 - increment / 16) * param_handler.params.z).toFixed(5)
+    swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
 
+    // Zoom towards the target
+    /*
+    param_handler.params.x = ((+param_handler.params.x) - (towards[0] - swgl.canvas.centre[0]) / 128 ).toFixed(5)
+    param_handler.params.y = ((+param_handler.params.y) - (towards[1] - swgl.canvas.centre[1]) / 128 ).toFixed(5)
+    swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
+    */
 
+    param_handler.update()
+  }
+
+  // Move position (translate)
+  var movePosition = function(x, y) {
+    param_handler.params.x = (x + +param_handler.params.x).toFixed(5)
+    param_handler.params.y = (y + +param_handler.params.y).toFixed(5)
+    swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
+    swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+    param_handler.update()
+  }
+
+  // Init Web GL
   var swgl = new sWebGL({
     plugins: {
-
-      'params': new sParams({
-        /*
-        onChange: {
-
-          // Update rotation
-          'r': function(v) {
-            console.log('Rotate', v)
-          }
-
-        },
-        */
-      }),
-
-      'panel': new sPanel({
-      }),
-
       'mouse': new sMouse({
         onDown: {
 
           // left-click
           0: function() {
-            mouse_left_last_click = + new Date()
+            mouse_left_last_click = +new Date()
 
             // Record position for dragging
             mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
           },
 
-          // middle-click
-          1: function() {
-            // Reset view
-            swgl.params.x = swgl.params.y = 0
-            swgl.params.sx = swgl.params.sy = 1
-            swgl.params.r = 0
-            swgl.updateParams()
-          },
-
           // right-click
           2: function() {
-            mouse_right_last_click = + new Date()
+            mouse_right_last_click = +new Date()
           },
 
         },
@@ -176,29 +188,20 @@ window.onload = function() {
             // if right-click is not also pressed
             if (swgl.plugins.mouse.b[2] === 0) {
               // Move by dragging
+              var z = param_handler.params.z * 7
               var mouse_delta = [
-                swgl.xToScreenBasis(mouse_left_drag_last_position[0]) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0]),
-                swgl.yToScreenBasis(mouse_left_drag_last_position[1]) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1])
+                swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
+                swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
               ]
               mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
-              swgl.move(
-                //swgl.xFromScreenBasis(mouse_delta[0]),
-                //swgl.yFromScreenBasis(mouse_delta[1])
-                -mouse_delta[0],
-                mouse_delta[1]
-              )
-            }
-            else {
-              // Rotate
-              if (mouse_left_last_click > mouse_right_last_click) {
-                swgl.rotate(0.001)
+              if (mouse_delta[0] || mouse_delta[1]) {
+                movePosition(-mouse_delta[0], mouse_delta[1])
               }
-              else {
-                swgl.rotate(-0.001)
-              }
+
             }
           },
 
+          /*
           // right-click
           2: function() {
             // ignore when left-click is also pressed
@@ -211,163 +214,181 @@ window.onload = function() {
               -(swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / 4096
             )
           },
+          */
 
         },
         onWheel: function(i) {
-          swgl.incrementZoom(-i, swgl.plugins.mouse.p)
+          incrementZoom(i, swgl.plugins.mouse.p)
         },
-        onTouchStart: function(changedTouches) {
-            touchmove_drag_last_position = [changedTouches[0].clientX, changedTouches[0].clientY]
-            touchmove_drag_last_quadrance = null
-        },
-        onTouchMove: function(changedTouches) {
 
-          // 1 touch: Drag screen around
-          if (changedTouches.length === 1) {
-
-            var delta = [
-              swgl.xToScreenBasis(touchmove_drag_last_position[0]) - swgl.xToScreenBasis(changedTouches[0].clientX),
-              swgl.yToScreenBasis(touchmove_drag_last_position[1]) - swgl.yToScreenBasis(changedTouches[0].clientY)
-            ]
-            touchmove_drag_last_position = [changedTouches[0].clientX, changedTouches[0].clientY]
-
-            swgl.move(
-              -delta[0],
-              delta[1]
-            )
-
-          }
-
-          // 2 touches: Zoom/Rotate
-          else if (changedTouches.length === 2) {
-
-            //
-            var touch_1 = [changedTouches[0].clientX, changedTouches[0].clientY]
-            var touch_2 = [changedTouches[1].clientX, changedTouches[1].clientY]
-            //var touch_2 = [swgl.canvas.centre[0], swgl.canvas.centre[1]] // for testing with only 1 touch
-
-            //console.log(touch_1, touch_2)
-
-            // the squared distance between the 2 touches
-            var quadrance =
-              Math.pow(touch_1[0] - touch_2[0], 2) +
-              Math.pow(touch_1[1] - touch_2[1], 2)
-
-            // the "angle" of the line between the 2 touches, with 0 being horizontal and 0.5 being vertical, 0.25 being a slope from top left to bottom right
-
-            var horizontal_vector = [1, 0]
-            var tilt_vector = [
-              swgl.xFromScreenBasis(touch_1[0]) - swgl.xFromScreenBasis(touch_2[0]),
-              swgl.yFromScreenBasis(touch_1[1]) - swgl.yFromScreenBasis(touch_2[1])
-            ]
-
-            var tilt =
-              Math.acos(
-                (
-                  tilt_vector[0] * horizontal_vector[0] +
-                  tilt_vector[1] * horizontal_vector[1]
-                ) /
-                (
-                  Math.sqrt(
-                    Math.pow(tilt_vector[0], 2) +
-                    Math.pow(tilt_vector[1], 2)
-                  ) +
-                  Math.sqrt(
-                    Math.pow(horizontal_vector[0], 2) +
-                    Math.pow(horizontal_vector[1], 2)
-                  )
-                )
-              )
-
-            // ignore first move when when don't know the previous distance
-            if (touchmove_drag_last_quadrance !== null) {
-
-              var distance_delta = Math.sqrt(quadrance) - Math.sqrt(touchmove_drag_last_quadrance)
-              var tilt_delta = tilt - touchmove_drag_last_tilt
-              var zoom_towards = [
-                (touch_1[0] + touch_2[0]) / 2,
-                (touch_1[1] + touch_2[1]) / 2
-              ]
-
-              // @hack if touch 1 is higher than touch 2, reverse the rotate direction
-              // @todo replace acos as a better fix
-              if (touch_1[1] < touch_2[1]) {
-                tilt_delta = -tilt_delta
-              }
-
-              swgl.incrementZoom(distance_delta / 8, zoom_towards)
-              swgl.rotate(tilt_delta / 8) // broken?
-
-              //console.log('d', distance_delta)
-              //console.log('t', tilt_delta)
-
-            }
-
-            // remember for next move
-            touchmove_drag_last_quadrance = quadrance
-            touchmove_drag_last_tilt = tilt
-
-          }
-
-          // 3 touches: why?
-          if (changedTouches.length === 3) {
-            console.log('2 in the pink, 1 in the stink')
-          }
-
-        }
       }),
 
       'keys': new sKeys({
         onDown: {
 
-          // +: Zoom in
-          107: function() {
-            swgl.incrementZoom(1)
-          },
-          // -: Zoom out
-          109: function() {
-            swgl.incrementZoom(-1)
-          },
-
           // up: Up
           38: function() {
-            swgl.move(0, 1/8)
+            movePosition(0, 32)
           },
           // left: Left
           37: function() {
-            swgl.move(-1/8, 0)
+            movePosition(0, 32)
           },
           // down: Down
           40: function() {
-            swgl.move(0, -1/8)
+            movePosition(0, -32)
           },
           // right: Right
           39: function() {
-            swgl.move(1/8, 0)
+            movePosition(32, 0)
           },
 
-          // w: Up
-          87: function() {
-            swgl.move(0, 1)
+          // +: Zoom in
+          107: function() {
+            incrementZoom(1)
           },
-          // a: Left
-          65: function() {
-            swgl.move(-1, 0)
+          // -: Zoom out
+          109: function() {
+            incrementZoom(-1)
           },
-          // s: Down
-          83: function() {
-            swgl.move(0, -1)
-          },
-          // d: Right
-          68: function() {
-            swgl.move(1, 0)
-          }
 
         }
       })
 
     }
   })
+
+  // Callback functions when params are changed
+  var param_onchange_callbacks = {
+    'x': function(v) {
+      swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
+      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+    },
+    'y': function(v) {
+      swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
+      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+    },
+    'z': function(v) {
+      swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
+      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+    },
+  }
+
+
+  // Draw something as a demo
+  var actor = new sDemo()
+
+  // Get params from URL hash and update URL when they change
+  var param_handler = new sParams({onchange: param_onchange_callbacks})
+
+  // Default params
+  param_handler.params = {
+
+      // Scroll position
+      x: 0,
+      y: 0,
+
+      // Zoom
+      z: 0.2,
+
+  }
+
+  // Parse supplies params
+  param_handler.parse(false)
+
+  // Update params in URL hash
+  param_handler.update()
+
+  // Set sWebGL params
+  swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
+  swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
+
+  // Set actor params from URL hash
+  /*
+  for (var param_name in param_handler.params) {
+    var indexes = param_name.split('_')
+    switch (indexes[0]) {
+
+      case 'p':
+        actor.transformation_probabilities[indexes[1]] =
+        param_handler.params[param_name]
+        break;
+
+      case 'm':
+        actor.transformation_matrices[indexes[1]][indexes[2]] = param_handler.params[param_name]
+        break;
+
+      case 'v':
+        actor.transformation_vectors[indexes[1]][indexes[2]] = param_handler.params[param_name]
+        break;
+
+    }
+  }
+  */
+
+
+  // Point in time counter (eg. frame number)
+  var pot = 0
+
+  var color_offsets = vec3.create()
+  vec3.random(color_offsets)
+  var color_frequencies = vec3.create()
+  vec3.random(color_frequencies, 0.05)
+
+  swgl.drawScene = function() {
+
+    pot++
+
+    if (typeof swgl.plugins === 'object') {
+      for (var i in swgl.plugins) if (swgl.plugins[i].hasOwnProperty('whileDown')) {
+        for (var j in swgl.plugins[i].whileDown) {
+          if (swgl.plugins[i].b[j]) {
+            swgl.plugins[i].whileDown[j]()
+          }
+        }
+      }
+    }
+
+    // Randomize colour
+    //swgl.gl.uniform4f(this.color_location, Math.random(), Math.random(), Math.random(), 1)
+
+    // Siney colour
+    swgl.gl.uniform4f(
+      this.color_location,
+      1 + Math.sin(color_offsets[0] + pot * color_frequencies[0]),
+      1 + Math.sin(color_offsets[1] + pot * color_frequencies[1]),
+      1 + Math.sin(color_offsets[2] + pot * color_frequencies[2]),
+      1
+    )
+
+    //swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+
+    // Reset initial position
+    actor.reset()
+
+    // Iterate
+    actor.iterate()
+  }
+
+  // Draw the actor control panel
+  var panel = new sPanel()
+
+  panel.drawSliders(
+    actor.params,
+    'param',
+    {
+      min: 0,
+      max: 1,
+      onchange: function(name) {
+        var indexes = name.split('_')
+        //console.log('slider onchange()', name, '=', actor.params[indexes[1]])
+        param_handler.params[name] = actor.params[indexes[1]].toFixed(3)
+        param_handler.update()
+        //swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+      },
+    }
+  )
+
 }
 
 </script>

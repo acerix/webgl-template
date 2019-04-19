@@ -8,6 +8,8 @@ export class sMouse {
 
     var self = this
 
+    if (typeof options ==='undefined') options = {}
+
     // Cursor position [x, y], distance from top left in pixels
     this.p = [0, 0]
 
@@ -30,8 +32,15 @@ export class sMouse {
     this.onTouchStart = options.hasOwnProperty('onTouchStart') ? options.onTouchStart : null
     this.onTouchMove = options.hasOwnProperty('onTouchMove') ? options.onTouchMove : null
 
+  }
+
+  init(swgl) {
+
+    var self = this
+    var target = swgl.canvas
+
     // Handle mouse move
-    window.onmousemove = function(e) {
+    target.onmousemove = function(e) {
       if (e.originalTarget && typeof e.originalTarget.offsetLeft === 'number') {
         self.p[0] = e.clientX - e.originalTarget.offsetLeft
         self.p[1] = e.clientY - e.originalTarget.offsetTop
@@ -43,13 +52,13 @@ export class sMouse {
     }
 
     // Handle mouse button press/release
-    window.onmousedown = function(e) {
+    target.onmousedown = function(e) {
       self.b[e.button] = 1
       if (typeof self.onDown[e.button] === 'function') {
         self.onDown[e.button]()
       }
     }
-    window.onmouseup = function(e) {
+    target.onmouseup = function(e) {
       self.b[e.button] = 0
       if (typeof self.onUp[e.button] === 'function') {
         self.onUp[e.button]()
@@ -58,7 +67,7 @@ export class sMouse {
 
     // Handle mouse wheel
     if (this.onWheel !== null) {
-      window.onwheel = function(e) {
+      target.onwheel = function(e) {
         e.preventDefault()
         // firefox gives a delta of 3 but chome is 53... so normalize to 1
         self.onWheel(e.deltaY > 0 ? 1 : -1)
@@ -67,7 +76,7 @@ export class sMouse {
 
     // Handle touch screen start
     if (this.onTouchStart !== null) {
-      window.ontouchstart = function(e) {
+      target.ontouchstart = function(e) {
         e.preventDefault()
         self.onTouchStart(e.changedTouches)
       }
@@ -75,14 +84,14 @@ export class sMouse {
 
     // Handle touch screen move
     if (this.onTouchMove !== null) {
-      window.ontouchmove = function(e) {
+      target.ontouchmove = function(e) {
         e.preventDefault()
         self.onTouchMove(e.changedTouches)
       }
     }
 
     // Disable context menu on right-click
-    document.oncontextmenu = function() {
+    target.oncontextmenu = function() {
       return false
     }
 

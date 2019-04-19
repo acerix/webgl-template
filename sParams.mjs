@@ -8,27 +8,26 @@ export class sParams {
 
     var self = this
 
+    if (typeof options ==='undefined') options = {}
+
     // Parameter values
     this.params = {}
 
     // Callbacks for each param when changed
-    this.onChange = options.hasOwnProperty('onChange') ? options.onChange : {}
+    this.onchange = options.hasOwnProperty('onchange') ? options.onchange : {}
 
     // Parse when URL hash changes
     window.onhashchange = function() {
       self.parse(true)
     }
 
-    // Parse on init
-    //this.parse(false)
-
   }
 
-  // Called with the top level object (sWebGL) after it has been initialized
-  init(swgl) {
+  // Called with param object
+  init(params) {
 
     // Reference main params
-    this.params = swgl.params
+    this.params = params
 
     // Update URL hash on init
     this.update()
@@ -47,8 +46,8 @@ export class sParams {
       // Only allow numbers, convert to int if whole otherwise float
       this.params[i] = new_params[i] % 1 === 0 ? parseInt(new_params[i], 10) : parseFloat(new_params[i])
 
-      if (runCallbacks && i in this.onChange) {
-        this.onChange[i](this.params[i])
+      if (runCallbacks && i in this.onchange) {
+        this.onchange[i](this.params[i])
       }
     }
   }
