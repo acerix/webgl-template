@@ -42,16 +42,19 @@ void main() {
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  //z = x * x + y * y; // circle
+  z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
-  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // Set pixel colour
-  gl_FragColor.r = mod(z * u_color_params.r - u_time / 128.0, 1.0);
-  gl_FragColor.g = mod(z * u_color_params.g - u_time / 128.0, 1.0);
-  gl_FragColor.b = mod(z * u_color_params.b - u_time / 128.0, 1.0);
+  //gl_FragColor.r = mod(z * u_color_params.r - u_time / 128.0, 1.0);
+  //gl_FragColor.g = mod(z * u_color_params.g - u_time / 128.0, 1.0);
+  //gl_FragColor.b = mod(z * u_color_params.b - u_time / 128.0, 1.0);
+  gl_FragColor.r = sin(z * u_color_params.r - u_time / 8.0) / 2.0 + 0.5;
+  gl_FragColor.g = sin(z * u_color_params.g - u_time / 8.0) / 2.0 + 0.5;
+  gl_FragColor.b = sin(z * u_color_params.b - u_time / 8.0) / 2.0 + 0.5;
 
 }
 

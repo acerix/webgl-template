@@ -15,6 +15,7 @@ export class sDemo {
 
     // Example actor params
     this.colour = [
+      //0,0,0
       10 - 20 * Math.random(),
       10 - 20 * Math.random(),
       10 - 20 * Math.random()
