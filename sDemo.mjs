@@ -15,14 +15,11 @@ export class sDemo {
 
     // Example actor params
     this.params = [
-      0.3,
-      0.7
+      Math.random(),
+      Math.random(),
+      Math.random()
     ]
 
-  }
-
-  // Iterate?
-  iterate() {
   }
 
   // Reset position to origin

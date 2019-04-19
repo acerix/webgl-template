@@ -38,19 +38,6 @@ void main() {
   float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
   float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
 
-  // transform fragcoord to cartesian coord
-  // @todo simplify to one matrix
-
-  //float sin_theta = sin(rotate);
-  //float cos_theta = cos(rotate);
-
-  //float x2 = cos_theta * x - sin_theta * y;
-  //float y2 = sin_theta * x + cos_theta * y;
-
-  //x = x2;
-  //y = y2;
-
-
   // the return value of the function
   float z = 1.0;
 
@@ -126,8 +113,7 @@ window.onload = function() {
   var movePosition = function(x, y) {
     param_handler.params.x = (x + +param_handler.params.x).toFixed(5)
     param_handler.params.y = (y + +param_handler.params.y).toFixed(5)
-    swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
-    swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
+    updateTransformLocation()
     param_handler.update()
   }
 
@@ -233,27 +219,28 @@ window.onload = function() {
   })
 
   // Callback functions when params are changed
-  var param_onchange_callbacks = {
-    'x': function(v) {
-      swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
-      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
-    },
-    'y': function(v) {
-      swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
-      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
-    },
-    'z': function(v) {
-      swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
-      swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
-    },
+  var updateTransformLocation = function() {
+    swgl.gl.uniform2f(
+      swgl.transform_location,
+      +param_handler.params.x + swgl.canvas.centre[0] / swgl.smallestScreenEdge(),
+      +param_handler.params.y + swgl.canvas.centre[1] / swgl.smallestScreenEdge()
+    )
   }
-
+  var updateScaleLocation = function(v) {
+    swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
+  }
 
   // Draw something as a demo
   var actor = new sDemo()
 
   // Get params from URL hash and update URL when they change
-  var param_handler = new sParams({onchange: param_onchange_callbacks})
+  var param_handler = new sParams({
+    onchange: {
+      'x': updateTransformLocation,
+      'y': updateTransformLocation,
+      'z': updateScaleLocation
+    }
+  })
 
   // Default params
   param_handler.params = {
@@ -263,7 +250,7 @@ window.onload = function() {
       y: 0,
 
       // Zoom
-      z: 1.0,
+      z: 0.5,
 
   }
 
@@ -274,8 +261,8 @@ window.onload = function() {
   param_handler.update()
 
   // Set sWebGL params
-  swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
-  swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
+  updateTransformLocation()
+  updateScaleLocation()
 
   // Set actor params from URL hash
   for (var param_name in param_handler.params) {
