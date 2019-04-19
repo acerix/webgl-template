@@ -11,26 +11,10 @@
 
 <script id="shader-vs" type="text/x-vertex_shader">
 
-precision lowp float;
-
 attribute vec2 a_position;
-uniform vec2 u_resolution;
-uniform float u_scale;
-uniform vec2 u_transform;
 
 void main(void) {
-
-  // convert from pixels to 0...1
-  vec2 clip_space = a_position / u_resolution;
-
-  // scale
-  clip_space *= u_resolution.y * u_scale;
-
-  // translate
-  clip_space += u_transform;
-
-  gl_Position = vec4(clip_space, 0.0, 1.0);
-
+  gl_Position = vec4(a_position, 0.0, 1.0);
 }
 
 </script>
@@ -39,21 +23,11 @@ void main(void) {
 
 precision lowp float;
 
-// point in time
+uniform vec2 u_resolution;
+uniform float u_scale;
+uniform vec2 u_transform;
+
 uniform float u_time;
-
-// transform basis
-uniform vec2 translate;
-uniform vec2 scale;
-uniform float rotate;
-
-// @todo convert above 3 to a matrix
-uniform mat2 transform_canvas_to_cartesian;
-
-// @todo put in vec3?
-uniform float r;
-uniform float g;
-uniform float b;
 
 uniform vec4 u_color;
 
@@ -61,6 +35,8 @@ void main() {
 
   //float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
   //float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
+  float x = ( gl_FragCoord.x / u_resolution.x - u_transform.x ) / u_scale;
+  float y = ( gl_FragCoord.y / u_resolution.y - u_transform.y ) / u_scale;
 
   // transform fragcoord to cartesian coord
   // @todo simplify to one matrix
@@ -76,13 +52,13 @@ void main() {
 
 
   // the return value of the function
-  //float z = 0.0;
+  float z = 1.0;
 
   // function to calculate z from x and y
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  //z = x * x + y * y; // circle
+  z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
   //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
@@ -98,14 +74,11 @@ void main() {
   //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
 
   // set pixel colours
-  //gl_FragColor.r = mod(z * r - u_time / 128.0, 1.0);
-  //gl_FragColor.g = mod(z * g - u_time / 128.0, 1.0);
-  //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
+  gl_FragColor.r = mod(z * 3.2 - u_time / 128.0, 1.0);
+  gl_FragColor.g = mod(z * 4.1 - u_time / 128.0, 1.0);
+  gl_FragColor.b = mod(z * 2.9 - u_time / 128.0, 1.0);
 
-
-  //gl_FragColor = u_color;
-
-  gl_FragColor = vec4(0, 0.8, 0, 1);
+  gl_FragColor = (gl_FragColor + u_color) / 2.0;
 
 }
 
@@ -136,7 +109,7 @@ window.onload = function() {
 
   // Increment the zoom level (scale)
   var incrementZoom = function(increment, towards) {
-    param_handler.params.z = ((1 - increment / 16) * param_handler.params.z).toFixed(5)
+    param_handler.params.z = ((1 + increment / 16) * param_handler.params.z).toFixed(5)
     swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
 
     // Zoom towards the target
@@ -214,7 +187,7 @@ window.onload = function() {
 
         },
         onWheel: function(i) {
-          incrementZoom(i, swgl.plugins.mouse.p)
+          incrementZoom(-i, swgl.plugins.mouse.p)
         },
 
       }),

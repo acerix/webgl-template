@@ -28,7 +28,7 @@ export class sWebGL {
     // Init canvas
     this.gl = this.canvas.getContext('webgl', {
       alpha: false,
-      //depth: false,
+      depth: false,
       preserveDrawingBuffer: true
     })
 
@@ -72,22 +72,25 @@ export class sWebGL {
   // Begin or restart rendering
   init() {
     var gl = this.gl
-    gl.clearColor(0.3, 0.0, 0.3, 1.0)
+    //gl.clearColor(0.0, 0.0, 0.0, 1.0)
     //gl.clearDepth(1.0)
     //gl.enable(gl.DEPTH_TEST)
-    gl.depthFunc(gl.LEQUAL)
+    //gl.depthFunc(gl.LEQUAL)
     this.initShaders()
   }
 
   // Load shaders
   initShaders() {
     var gl = this.gl
+
     var shader_program = gl.createProgram()
 
     // Attach shaders
     gl.attachShader(shader_program, this.getShader('shader-vs'))
     gl.attachShader(shader_program, this.getShader('shader-fs'))
+
     gl.linkProgram(shader_program)
+
     if (!gl.getProgramParameter(shader_program, gl.LINK_STATUS)) {
       throw new Error(gl.getProgramInfoLog(shader_program))
     }
