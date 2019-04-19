@@ -35,6 +35,7 @@ export class sWebGL {
     // Uniforms
     this.scale_location = null
     this.tranform_location = null
+    this.speed_location = null
     this.resolution_location = null
     this.color_params_location = null
 
@@ -111,6 +112,11 @@ export class sWebGL {
 
     // Speed
     this.speed_location = gl.getUniformLocation(shader_program, 'u_speed')
+
+    // Default speed
+    gl.uniform1f(this.speed_location, Math.random())
+
+    console.log(this.speed_location)
 
     // Time
     this.time_location = gl.getUniformLocation(shader_program, 'u_time')

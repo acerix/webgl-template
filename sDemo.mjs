@@ -12,7 +12,7 @@ export class sDemo {
 
     this.position = vec2.create()
 
-    this.speed = 128
+    this.speed = [0.1]
 
     this.colour = [
       100 - 200 * Math.random(),
