@@ -28,6 +28,7 @@ export class sWebGL {
     // Init canvas
     this.gl = this.canvas.getContext('webgl', {
       alpha: false,
+      //depth: false,
       preserveDrawingBuffer: true
     })
 
@@ -47,10 +48,13 @@ export class sWebGL {
       ]
       self.gl.viewport(0, 0, self.canvas.width, self.canvas.height)
       self.gl.uniform2f(self.resolution_location, self.canvas.width, self.canvas.height)
+      self.gl.clear(self.gl.COLOR_BUFFER_BIT)
     }
 
-    // Trigger resize on init
+    // Initialize WebGL
     this.init()
+
+    // Trigger resize after init
     window.onresize()
 
     // Init plugins
@@ -60,60 +64,88 @@ export class sWebGL {
       }
     }
 
+    // Start main loop
     this.life(this)
 
   }
 
   // Begin or restart rendering
   init() {
-    //var gl = this.gl
-    //gl.clearColor(0.0, 0.0, 0.0, 1.0)  // Clear to black, fully opaque
-    //gl.clearDepth(1.0)                 // Clear everything
-    //gl.enable(this.gl.DEPTH_TEST)      // Enable depth testing
-    //gl.depthFunc(this.gl.LEQUAL)       // Near things obscure far things
+    var gl = this.gl
+    gl.clearColor(0.3, 0.0, 0.3, 1.0)
+    //gl.clearDepth(1.0)
+    //gl.enable(gl.DEPTH_TEST)
+    gl.depthFunc(gl.LEQUAL)
     this.initShaders()
   }
 
   // Load shaders
   initShaders() {
     var gl = this.gl
-    var shaderProgram = gl.createProgram()
+    var shader_program = gl.createProgram()
 
-    gl.attachShader(shaderProgram, this.getShader('shader-vs'))
-    gl.attachShader(shaderProgram, this.getShader('shader-fs'))
-    gl.linkProgram(shaderProgram)
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      throw new Error(gl.getProgramInfoLog(shaderProgram))
+    // Attach shaders
+    gl.attachShader(shader_program, this.getShader('shader-vs'))
+    gl.attachShader(shader_program, this.getShader('shader-fs'))
+    gl.linkProgram(shader_program)
+    if (!gl.getProgramParameter(shader_program, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(shader_program))
     }
 
-    gl.useProgram(shaderProgram)
+    gl.useProgram(shader_program)
 
-    // Look up where the vertex data needs to go.
-    var positionLocation = gl.getAttribLocation(shaderProgram, 'a_position')
+    // @debug
 
-    // Scale
-    this.scale_location = gl.getUniformLocation(shaderProgram, 'u_scale')
+    var vertices = [
+       0.5,0.5, 0,    //Vertex 1
+       0.5,-0.5, 0,   //Vertex 2
+       -0.5,-0.5, 0,  //Vertex 3
+    ];
+    var indices = [ 0,1,2 ];
 
-    // Scroll position
-    this.transform_location = gl.getUniformLocation(shaderProgram, 'u_transform')
+    var vertex_buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+    var coordinatesVar = gl.getAttribLocation(shader_program, "coordinates");
+    gl.vertexAttribPointer(coordinatesVar, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(coordinatesVar);
+
+/*
+    // Position of vertex data
+    var position_location = gl.getAttribLocation(shader_program, 'a_position')
 
     // Screen resolution
-    this.resolution_location = gl.getUniformLocation(shaderProgram, 'u_resolution')
+    this.resolution_location = gl.getUniformLocation(shader_program, 'u_resolution')
+
+    // Scale
+    this.scale_location = gl.getUniformLocation(shader_program, 'u_scale')
+
+    // Scroll position
+    this.transform_location = gl.getUniformLocation(shader_program, 'u_transform')
 
     // Colour
-    this.color_location = gl.getUniformLocation(shaderProgram, 'u_color')
+    this.color_location = gl.getUniformLocation(shader_program, 'u_color')
 
-    // Create a buffer
-    var buffer = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.enableVertexAttribArray(positionLocation)
+    // Initial colour
+    //gl.uniform4f(this.color_location, 0, 1, 0, 1)
 
-    // Send the vertex data to the shader program
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
+    // Position vertices
+    var vertices = new Float32Array([ // Int8Array?
+       1,  1,  0,
+      -1,  1,  0,
+       1, -1,  0,
+      -1, -1,  0
+    ])
 
-    // Set initial colour to green
-    gl.uniform4f(this.color_location, 0, 1, 0, 1)
-
+    // Bind position buffer
+    var vertex_buffer = gl.createBuffer()
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
+    //gl.bindBuffer(gl.ARRAY_BUFFER, null) // unbind
+    gl.vertexAttribPointer(position_location, 3, gl.FLOAT, false, 0, 0)
+*/
   }
 
   // Looping callback
@@ -151,6 +183,7 @@ export class sWebGL {
   }
 
   // Draw a pixel on the canvas
+  /*
   drawPixel(position) {
     var gl = this.gl
     gl.bufferData(gl.ARRAY_BUFFER, position, gl.STATIC_DRAW)
@@ -163,6 +196,7 @@ export class sWebGL {
     gl.bufferData(gl.ARRAY_BUFFER, position_buffer, gl.STATIC_DRAW)
     gl.drawArrays(gl.POINTS, 0, position_buffer.length)
   }
+  */
 
   // Return the height of the screen or width if smaller
   smallestScreenEdge() {

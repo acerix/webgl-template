@@ -9,7 +9,47 @@
 </head>
 <body>
 
+<script id="shader-vs" type="text/x-vertex_shader">
+attribute vec2 coordinates;
+
+void main(void) {
+   gl_Position = vec4(coordinates, 0.0, 1.0);
+}
+</script>
+
+
 <script id="shader-fs" type="text/x-fragment_shader">
+void main(void) {
+   gl_FragColor = vec4(0, 0.8, 0, 1);
+}
+</script>
+
+
+<script id="xxshader-vs" type="text/x-vertex_shader">
+
+attribute vec2 a_position;
+uniform vec2 u_resolution;
+uniform float u_scale;
+uniform vec2 u_transform;
+
+void main() {
+
+  // convert from pixels to 0...1
+  vec2 clip_space = a_position / u_resolution;
+
+  // scale
+  clip_space *= u_resolution.y * u_scale;
+
+  // translate
+  clip_space += u_transform;
+
+  gl_Position = vec4(clip_space, 0.0, 1.0);
+
+}
+
+</script>
+
+<script id="xxshader-fs" type="text/x-fragment_shader">
 
 precision lowp float;
 
@@ -33,8 +73,8 @@ uniform vec4 u_color;
 
 void main() {
 
-  float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
-  float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
+  //float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
+  //float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
 
   // transform fragcoord to cartesian coord
   // @todo simplify to one matrix
@@ -50,10 +90,10 @@ void main() {
 
 
   // the return value of the function
-  float z = 0.0;
+  //float z = 0.0;
 
   // function to calculate z from x and y
-  z = x - y; // line
+  //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
   //z = x * x + y * y; // circle
@@ -80,34 +120,7 @@ void main() {
 
   //gl_FragColor = u_color;
 
-  gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
-
-}
-
-</script>
-
-<script id="shader-vs" type="text/x-vertex_shader">
-
-attribute vec2 a_position;
-
-uniform float u_scale;
-
-uniform vec2 u_transform;
-
-uniform vec2 u_resolution;
-
-void main() {
-
-  // convert from pixels to 0...1
-  vec2 clip_space = a_position / u_resolution;
-
-  // scale
-  clip_space *= u_resolution.y * u_scale;
-
-  // translate
-  clip_space += u_transform;
-
-  gl_Position = vec4(clip_space, 0.0, 1.0);
+  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 
 }
 
@@ -132,10 +145,9 @@ window.onload = function() {
   // Keep track of where the mouse was while dragging
   var mouse_left_drag_last_position = [0, 0]
 
-  // Keep track of when each button is pressed to determine which button was pressed first
+  // Keep track of when each button is pressed to know which button was pressed first
   var mouse_left_last_click = 0
   var mouse_right_last_click = 0
-
 
   // Increment the zoom level (scale)
   var incrementZoom = function(increment, towards) {
@@ -164,6 +176,7 @@ window.onload = function() {
   // Init Web GL
   var swgl = new sWebGL({
     plugins: {
+
       'mouse': new sMouse({
         onDown: {
 
@@ -224,21 +237,26 @@ window.onload = function() {
       'keys': new sKeys({
         onDown: {
 
-          // up: Up
-          38: function() {
-            movePosition(0, 32)
-          },
-          // left: Left
+          // ←: Left
           37: function() {
             movePosition(-32, 0)
           },
-          // down: Down
+          // ↑: Up
+          38: function() {
+            movePosition(0, 32)
+          },
+          // →: Right
+          39: function() {
+            movePosition(32, 0)
+          },
+          // ↓: Down
           40: function() {
             movePosition(0, -32)
           },
-          // right: Right
-          39: function() {
-            movePosition(32, 0)
+
+          //
+          70: function() {
+            console.log(atob('UGF5IHJlc3BlY3Rz'))
           },
 
           // +: Zoom in
@@ -348,11 +366,15 @@ window.onload = function() {
       1
     )
 
+    // Draw actors
+    //swgl.gl.drawArrays(swgl.gl.TRIANGLE_STRIP, 0, 4)
+    swgl.gl.drawArrays(swgl.gl.TRIANGLES, 0, 3)
+
     // Reset initial position
-    actor.reset()
+    //actor.reset()
 
     // Iterate
-    actor.iterate()
+    //actor.iterate()
   }
 
   // Draw the actor control panel
