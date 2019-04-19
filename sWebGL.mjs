@@ -47,7 +47,7 @@ export class sWebGL {
         Math.floor(self.canvas.height/2)
       ]
       self.gl.viewport(0, 0, self.canvas.width, self.canvas.height)
-      self.gl.uniform2f(self.resolution_location, self.canvas.width, self.canvas.height)
+      self.gl.uniform1f(self.resolution_location, self.smallestScreenEdge())
       self.gl.clear(self.gl.COLOR_BUFFER_BIT)
     }
 

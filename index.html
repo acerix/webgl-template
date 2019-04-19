@@ -23,7 +23,7 @@ void main(void) {
 
 precision lowp float;
 
-uniform vec2 u_resolution;
+uniform float u_resolution;
 uniform float u_scale;
 uniform vec2 u_transform;
 
@@ -35,8 +35,8 @@ void main() {
 
   //float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
   //float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
-  float x = ( gl_FragCoord.x / u_resolution.x - u_transform.x ) / u_scale;
-  float y = ( gl_FragCoord.y / u_resolution.y - u_transform.y ) / u_scale;
+  float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
+  float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
 
   // transform fragcoord to cartesian coord
   // @todo simplify to one matrix
@@ -58,9 +58,9 @@ void main() {
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  z = x * x + y * y; // circle
+  //z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
-  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
+  z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
