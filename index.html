@@ -25,6 +25,7 @@ precision lowp float;
 
 uniform float u_resolution;
 uniform float u_scale;
+uniform float u_speed;
 uniform vec2 u_transform;
 uniform vec3 u_color_params;
 uniform float u_time;
@@ -173,7 +174,7 @@ window.onload = function() {
           // esc: Reset
           27: function() {
             param_handler.params.x = param_handler.params.y = 0
-            param_handler.params.z = 0.5
+            param_handler.params.z = 0.1
             param_handler.update()
           },
 
@@ -247,7 +248,7 @@ window.onload = function() {
       y: 0,
 
       // Zoom
-      z: 0.5,
+      z: 0.1,
 
   }
 
@@ -312,11 +313,26 @@ window.onload = function() {
   var panel = new sPanel()
 
   panel.drawSliders(
+    [actor.speed],
+    'speed',
+    {
+      min: 0,
+      max: 10,
+      onchange: function(name) {
+        var indexes = name.split('_')
+        param_handler.params[name] = actor.speed.toFixed(3)
+        //swgl.speed_location = param_handler.params[name]
+        swgl.gl.uniform1f(swgl.speed_location, actor.speed)
+        param_handler.update()
+      },
+    }
+  )
+  panel.drawSliders(
     actor.colour,
     'colour',
     {
-      min: -10,
-      max: 10,
+      min: -100,
+      max: 100,
       onchange: function(name) {
         var indexes = name.split('_')
         param_handler.params[name] = actor.colour[indexes[1]].toFixed(3)

@@ -10,15 +10,14 @@ export class sDemo {
 
     if (typeof options ==='undefined') options = {}
 
-    // The actor's position (2d)
     this.position = vec2.create()
 
-    // Example actor params
+    this.speed = 128
+
     this.colour = [
-      //0,0,0
-      10 - 20 * Math.random(),
-      10 - 20 * Math.random(),
-      10 - 20 * Math.random()
+      100 - 200 * Math.random(),
+      100 - 200 * Math.random(),
+      100 - 200 * Math.random()
     ]
 
   }

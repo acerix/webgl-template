@@ -109,6 +109,9 @@ export class sWebGL {
     // Position
     this.transform_location = gl.getUniformLocation(shader_program, 'u_transform')
 
+    // Speed
+    this.speed_location = gl.getUniformLocation(shader_program, 'u_speed')
+
     // Time
     this.time_location = gl.getUniformLocation(shader_program, 'u_time')
 
