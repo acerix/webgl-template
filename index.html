@@ -26,22 +26,19 @@ precision lowp float;
 uniform float u_resolution;
 uniform float u_scale;
 uniform vec2 u_transform;
-
+uniform vec3 u_color_params;
 uniform float u_time;
-
-uniform vec4 u_color;
 
 void main() {
 
-  //float x = ( gl_FragCoord.x + translate.x ) * scale.x / 256.0;
-  //float y = ( gl_FragCoord.y + translate.y ) * scale.y / 256.0;
+  // Get final coordinates
   float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
   float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
 
-  // the return value of the function
-  float z = 1.0;
+  // Return value of the function
+  float z = 0.0;
 
-  // function to calculate z from x and y
+  // Function to calculate z from x and y
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
@@ -51,21 +48,10 @@ void main() {
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
-  // animate by varying the result with u_time
-  //z = z * -u_time;
-  //z = z + u_time;
-
-
-  // grey
-  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = z;
-  //gl_FragColor.r = gl_FragColor.g = gl_FragColor.b = mod(z - u_time / 16.0, 1.0);
-
-  // set pixel colours
-  gl_FragColor.r = mod(z * 3.2 - u_time / 128.0, 1.0);
-  gl_FragColor.g = mod(z * 4.1 - u_time / 128.0, 1.0);
-  gl_FragColor.b = mod(z * 2.9 - u_time / 128.0, 1.0);
-
-  gl_FragColor = (gl_FragColor + u_color) / 2.0;
+  // Set pixel colour
+  gl_FragColor.r = mod(z * u_color_params.r - u_time / 128.0, 1.0);
+  gl_FragColor.g = mod(z * u_color_params.g - u_time / 128.0, 1.0);
+  gl_FragColor.b = mod(z * u_color_params.b - u_time / 128.0, 1.0);
 
 }
 
@@ -181,21 +167,28 @@ window.onload = function() {
       'keys': new sKeys({
         onDown: {
 
+          // esc: Reset
+          27: function() {
+            param_handler.params.x = param_handler.params.y = 0
+            param_handler.params.z = 0.5
+            param_handler.update()
+          },
+
           // ←: Left
           37: function() {
-            movePosition(-32, 0)
+            movePosition(-1,  0)
           },
           // ↑: Up
           38: function() {
-            movePosition(0, 32)
+            movePosition( 0,  1)
           },
           // →: Right
           39: function() {
-            movePosition(32, 0)
+            movePosition( 1,  0)
           },
           // ↓: Down
           40: function() {
-            movePosition(0, -32)
+            movePosition( 0, -1)
           },
 
           //
@@ -232,6 +225,7 @@ window.onload = function() {
 
   // Draw something as a demo
   var actor = new sDemo()
+  swgl.gl.uniform3f(swgl.color_params_location, actor.colour[0], actor.colour[1], actor.colour[2])
 
   // Get params from URL hash and update URL when they change
   var param_handler = new sParams({
@@ -270,7 +264,7 @@ window.onload = function() {
     switch (indexes[0]) {
 
       case 'param':
-        actor.params[indexes[1]] = param_handler.params[param_name]
+        actor.colour[indexes[1]] = param_handler.params[param_name]
         // @todo update control panel sliders
         break;
 
@@ -289,6 +283,8 @@ window.onload = function() {
 
     pot++
 
+    swgl.gl.uniform1f(swgl.time_location, pot)
+
     if (typeof swgl.plugins === 'object') {
       for (var i in swgl.plugins) if (swgl.plugins[i].hasOwnProperty('whileDown')) {
         for (var j in swgl.plugins[i].whileDown) {
@@ -298,18 +294,6 @@ window.onload = function() {
         }
       }
     }
-
-    // Randomize colour
-    //swgl.gl.uniform4f(this.color_location, Math.random(), Math.random(), Math.random(), 1)
-
-    // Siney colour
-    swgl.gl.uniform4f(
-      this.color_location,
-      1 + Math.sin(color_offsets[0] + pot * color_frequencies[0]),
-      1 + Math.sin(color_offsets[1] + pot * color_frequencies[1]),
-      1 + Math.sin(color_offsets[2] + pot * color_frequencies[2]),
-      1
-    )
 
     // Draw actors
     swgl.gl.drawArrays(swgl.gl.TRIANGLE_STRIP, 0, 4)
@@ -325,14 +309,16 @@ window.onload = function() {
   var panel = new sPanel()
 
   panel.drawSliders(
-    actor.params,
-    'param',
+    actor.colour,
+    'colour',
     {
-      min: 0,
-      max: 1,
+      min: -10,
+      max: 10,
       onchange: function(name) {
         var indexes = name.split('_')
-        param_handler.params[name] = actor.params[indexes[1]].toFixed(3)
+        param_handler.params[name] = actor.colour[indexes[1]].toFixed(3)
+        swgl.color_params_location[indexes[1]] = param_handler.params[name]
+        swgl.gl.uniform3f(swgl.color_params_location, actor.colour[0], actor.colour[1], actor.colour[2])
         param_handler.update()
       },
     }

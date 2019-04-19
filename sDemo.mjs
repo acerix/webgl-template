@@ -14,10 +14,10 @@ export class sDemo {
     this.position = vec2.create()
 
     // Example actor params
-    this.params = [
-      Math.random(),
-      Math.random(),
-      Math.random()
+    this.colour = [
+      10 - 20 * Math.random(),
+      10 - 20 * Math.random(),
+      10 - 20 * Math.random()
     ]
 
   }

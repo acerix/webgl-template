@@ -36,7 +36,7 @@ export class sWebGL {
     this.scale_location = null
     this.tranform_location = null
     this.resolution_location = null
-    this.color_location = null
+    this.color_params_location = null
 
     // Handle viewport resize
     window.onresize = function() {
@@ -106,14 +106,17 @@ export class sWebGL {
     // Scale
     this.scale_location = gl.getUniformLocation(shader_program, 'u_scale')
 
-    // Scroll position
+    // Position
     this.transform_location = gl.getUniformLocation(shader_program, 'u_transform')
 
-    // Colour
-    this.color_location = gl.getUniformLocation(shader_program, 'u_color')
+    // Time
+    this.time_location = gl.getUniformLocation(shader_program, 'u_time')
 
-    // Initial colour
-    //gl.uniform4f(this.color_location, 0, 1, 0, 1)
+    // Colour Params
+    this.color_params_location = gl.getUniformLocation(shader_program, 'u_color_params')
+
+    // Default to something non-zero
+    gl.uniform3f(this.color_params_location, 1, 1, 1)
 
     // Position vertices
     var vertices = new Float32Array([
