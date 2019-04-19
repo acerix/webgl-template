@@ -25,6 +25,7 @@ a {
   color: #ccf;
   text-decoration: underline;
   cursor: pointer;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 a:hover {
   color: #99f;
@@ -37,6 +38,7 @@ a:hover {
   right: 10px;
   opacity: 0;
   transition: opacity 0.4s;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 .panel:hover {
   opacity: 1.0;
