@@ -232,7 +232,7 @@ window.onload = function() {
           },
           // left: Left
           37: function() {
-            movePosition(0, 32)
+            movePosition(-32, 0)
           },
           // down: Down
           40: function() {
@@ -304,28 +304,17 @@ window.onload = function() {
   swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
 
   // Set actor params from URL hash
-  /*
   for (var param_name in param_handler.params) {
     var indexes = param_name.split('_')
     switch (indexes[0]) {
 
-      case 'p':
-        actor.transformation_probabilities[indexes[1]] =
-        param_handler.params[param_name]
-        break;
-
-      case 'm':
-        actor.transformation_matrices[indexes[1]][indexes[2]] = param_handler.params[param_name]
-        break;
-
-      case 'v':
-        actor.transformation_vectors[indexes[1]][indexes[2]] = param_handler.params[param_name]
+      case 'param':
+        actor.params[indexes[1]] = param_handler.params[param_name]
+        // @todo should update control panel sliders
         break;
 
     }
   }
-  */
-
 
   // Point in time counter (eg. frame number)
   var pot = 0
