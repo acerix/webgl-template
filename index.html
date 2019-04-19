@@ -201,7 +201,6 @@ window.onload = function() {
             }
           },
 
-          /*
           // right-click
           2: function() {
             // ignore when left-click is also pressed
@@ -209,12 +208,11 @@ window.onload = function() {
               return
             }
             // move towards drag position
-            swgl.move(
+            movePosition(
               (swgl.canvas.centre[0] - swgl.plugins.mouse.p[0]) / 4096,
               -(swgl.canvas.centre[1] - swgl.plugins.mouse.p[1]) / 4096
             )
           },
-          */
 
         },
         onWheel: function(i) {
