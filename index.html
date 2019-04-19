@@ -10,29 +10,15 @@
 <body>
 
 <script id="shader-vs" type="text/x-vertex_shader">
-attribute vec2 coordinates;
 
-void main(void) {
-   gl_Position = vec4(coordinates, 0.0, 1.0);
-}
-</script>
-
-
-<script id="shader-fs" type="text/x-fragment_shader">
-void main(void) {
-   gl_FragColor = vec4(0, 0.8, 0, 1);
-}
-</script>
-
-
-<script id="xxshader-vs" type="text/x-vertex_shader">
+precision lowp float;
 
 attribute vec2 a_position;
 uniform vec2 u_resolution;
 uniform float u_scale;
 uniform vec2 u_transform;
 
-void main() {
+void main(void) {
 
   // convert from pixels to 0...1
   vec2 clip_space = a_position / u_resolution;
@@ -49,7 +35,7 @@ void main() {
 
 </script>
 
-<script id="xxshader-fs" type="text/x-fragment_shader">
+<script id="shader-fs" type="text/x-fragment_shader">
 
 precision lowp float;
 
@@ -117,10 +103,9 @@ void main() {
   //gl_FragColor.b = mod(z * b - u_time / 128.0, 1.0);
 
 
-
   //gl_FragColor = u_color;
 
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  gl_FragColor = vec4(0, 0.8, 0, 1);
 
 }
 
@@ -367,8 +352,7 @@ window.onload = function() {
     )
 
     // Draw actors
-    //swgl.gl.drawArrays(swgl.gl.TRIANGLE_STRIP, 0, 4)
-    swgl.gl.drawArrays(swgl.gl.TRIANGLES, 0, 3)
+    swgl.gl.drawArrays(swgl.gl.TRIANGLE_STRIP, 0, 4)
 
     // Reset initial position
     //actor.reset()

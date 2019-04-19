@@ -94,25 +94,6 @@ export class sWebGL {
 
     gl.useProgram(shader_program)
 
-    // @debug
-
-    var vertices = [
-       0.5,0.5, 0,    //Vertex 1
-       0.5,-0.5, 0,   //Vertex 2
-       -0.5,-0.5, 0,  //Vertex 3
-    ];
-    var indices = [ 0,1,2 ];
-
-    var vertex_buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
-    var coordinatesVar = gl.getAttribLocation(shader_program, "coordinates");
-    gl.vertexAttribPointer(coordinatesVar, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(coordinatesVar);
-
-/*
     // Position of vertex data
     var position_location = gl.getAttribLocation(shader_program, 'a_position')
 
@@ -132,7 +113,7 @@ export class sWebGL {
     //gl.uniform4f(this.color_location, 0, 1, 0, 1)
 
     // Position vertices
-    var vertices = new Float32Array([ // Int8Array?
+    var vertices = new Float32Array([
        1,  1,  0,
       -1,  1,  0,
        1, -1,  0,
@@ -143,9 +124,10 @@ export class sWebGL {
     var vertex_buffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
-    //gl.bindBuffer(gl.ARRAY_BUFFER, null) // unbind
     gl.vertexAttribPointer(position_location, 3, gl.FLOAT, false, 0, 0)
-*/
+    gl.bindBuffer(gl.ARRAY_BUFFER, null) // unbind
+    gl.enableVertexAttribArray(position_location)
+
   }
 
   // Looping callback
@@ -181,22 +163,6 @@ export class sWebGL {
     }
     return shader
   }
-
-  // Draw a pixel on the canvas
-  /*
-  drawPixel(position) {
-    var gl = this.gl
-    gl.bufferData(gl.ARRAY_BUFFER, position, gl.STATIC_DRAW)
-    gl.drawArrays(gl.POINTS, 0, 1)
-  }
-
-  // Draw pixels on the canvas
-  drawPixels(position_buffer) {
-    var gl = this.gl
-    gl.bufferData(gl.ARRAY_BUFFER, position_buffer, gl.STATIC_DRAW)
-    gl.drawArrays(gl.POINTS, 0, position_buffer.length)
-  }
-  */
 
   // Return the height of the screen or width if smaller
   smallestScreenEdge() {
