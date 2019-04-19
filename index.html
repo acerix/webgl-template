@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=no'>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>sWebGL</title>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
 <body>
 
-<script id='shader-fs' type='text/x-fragment_shader'>
+<script id="shader-fs" type="text/x-fragment_shader">
 
 precision lowp float;
 
@@ -53,10 +53,10 @@ void main() {
   float z = 0.0;
 
   // function to calculate z from x and y
-  //z = x - y; // line
+  z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  z = x * x + y * y; // circle
+  //z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
   //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
@@ -86,7 +86,7 @@ void main() {
 
 </script>
 
-<script id='shader-vs' type='text/x-vertex_shader'>
+<script id="shader-vs" type="text/x-vertex_shader">
 
 attribute vec2 a_position;
 
@@ -287,7 +287,7 @@ window.onload = function() {
       y: 0,
 
       // Zoom
-      z: 0.2,
+      z: 1.0,
 
   }
 
@@ -308,7 +308,7 @@ window.onload = function() {
 
       case 'param':
         actor.params[indexes[1]] = param_handler.params[param_name]
-        // @todo should update control panel sliders
+        // @todo update control panel sliders
         break;
 
     }
@@ -348,8 +348,6 @@ window.onload = function() {
       1
     )
 
-    //swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
-
     // Reset initial position
     actor.reset()
 
@@ -368,10 +366,8 @@ window.onload = function() {
       max: 1,
       onchange: function(name) {
         var indexes = name.split('_')
-        //console.log('slider onchange()', name, '=', actor.params[indexes[1]])
         param_handler.params[name] = actor.params[indexes[1]].toFixed(3)
         param_handler.update()
-        //swgl.gl.clear(swgl.gl.COLOR_BUFFER_BIT)
       },
     }
   )
