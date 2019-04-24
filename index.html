@@ -36,23 +36,19 @@ void main() {
   float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
   float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
 
-  // Return value of the function
-  float z = 0.0;
+  // Let z be the squared-distance from the origin, drawing a circle
+  float z = x * x + y * y;
 
-  // Function to calculate z from x and y
   //z = x - y; // line
   //z = x * x - y; // parabola
   //z = x * y - 1.0; // hyperbola
-  z = x * x + y * y; // circle
+  //z = x * x + y * y; // circle
   //z = -1.0 + x * x * x * y * y * y; // fermat curve
   //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
   //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
   //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
-  // Set pixel colour
-  //gl_FragColor.r = mod(z * u_color_params.r - u_time / 128.0, 1.0);
-  //gl_FragColor.g = mod(z * u_color_params.g - u_time / 128.0, 1.0);
-  //gl_FragColor.b = mod(z * u_color_params.b - u_time / 128.0, 1.0);
+  // Set pixel colours from periodic functions on z
   gl_FragColor.r = sin(z * u_color_params.r - u_time * u_speed) / 2.0 + 0.5;
   gl_FragColor.g = sin(z * u_color_params.g - u_time * u_speed) / 2.0 + 0.5;
   gl_FragColor.b = sin(z * u_color_params.b - u_time * u_speed) / 2.0 + 0.5;
@@ -86,28 +82,8 @@ window.onload = function() {
 
   // Increment the zoom level (scale)
   var incrementZoom = function(increment, towards) {
-
-    var factor = 1 + increment / 16
-
-    // Reverse zoom direction when scale is negative
-    if (param_handler.params.z < 0) {
-      factor = 1 / factor
-    }
-
-    var new_zoom = +(factor * param_handler.params.z).toFixed(6)
-    if (new_zoom === param_handler.params.z) {
-      new_zoom = +(+param_handler.params.z + increment * 0.000001).toFixed(6)
-    }
-    param_handler.params.z = new_zoom
+    param_handler.params.z = ( 1 + increment / 16 ) * param_handler.params.z
     updateScaleLocation()
-
-    // Zoom towards the target
-    /*
-    param_handler.params.x = ((+param_handler.params.x) - (towards[0] - swgl.canvas.centre[0]) / 128 ).toFixed(5)
-    param_handler.params.y = ((+param_handler.params.y) - (towards[1] - swgl.canvas.centre[1]) / 128 ).toFixed(5)
-    swgl.gl.uniform2f(swgl.transform_location, param_handler.params.x, param_handler.params.y)
-    */
-
     param_handler.update()
   }
 
@@ -349,7 +325,7 @@ window.onload = function() {
       min: -100,
       max: 100,
       onchange: function(name) {
-        var indexes = name.split('_')
+        var indexes = ['', +name.substring(name.lastIndexOf('_') + 1)]
         param_handler.params[name] = actor.colour_frequencies[indexes[1]].toFixed(3)
         swgl.color_params_location[indexes[1]] = param_handler.params[name]
         swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
