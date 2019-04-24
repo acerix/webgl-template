@@ -86,8 +86,20 @@ window.onload = function() {
 
   // Increment the zoom level (scale)
   var incrementZoom = function(increment, towards) {
-    param_handler.params.z = ((1 + increment / 16) * param_handler.params.z).toFixed(5)
-    swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
+
+    var factor = 1 + increment / 16
+
+    // Reverse zoom direction when scale is negative
+    if (param_handler.params.z < 0) {
+      factor = 1 / factor
+    }
+
+    var new_zoom = +(factor * param_handler.params.z).toFixed(6)
+    if (new_zoom === param_handler.params.z) {
+      new_zoom = +(+param_handler.params.z + increment * 0.000001).toFixed(6)
+    }
+    param_handler.params.z = new_zoom
+    updateScaleLocation()
 
     // Zoom towards the target
     /*
@@ -229,7 +241,7 @@ window.onload = function() {
 
   // Draw something as a demo
   var actor = new sDemo()
-  swgl.gl.uniform3f(swgl.color_params_location, actor.colour[0], actor.colour[1], actor.colour[2])
+  swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
 
   // Get params from URL hash and update URL when they change
   var param_handler = new sParams({
@@ -267,8 +279,8 @@ window.onload = function() {
     var indexes = param_name.split('_')
     switch (indexes[0]) {
 
-      case 'colour':
-        actor.colour[indexes[1]] = param_handler.params[param_name]
+      case 'colour_frequencies':
+        actor.colour_frequencies[indexes[1]] = param_handler.params[param_name]
         break;
 
       case 'speed':
@@ -331,16 +343,16 @@ window.onload = function() {
     }
   )
   panel.drawSliders(
-    actor.colour,
-    'colour',
+    actor.colour_frequencies,
+    'colour_frequencies',
     {
       min: -100,
       max: 100,
       onchange: function(name) {
         var indexes = name.split('_')
-        param_handler.params[name] = actor.colour[indexes[1]].toFixed(3)
+        param_handler.params[name] = actor.colour_frequencies[indexes[1]].toFixed(3)
         swgl.color_params_location[indexes[1]] = param_handler.params[name]
-        swgl.gl.uniform3f(swgl.color_params_location, actor.colour[0], actor.colour[1], actor.colour[2])
+        swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
         param_handler.update()
       },
     }

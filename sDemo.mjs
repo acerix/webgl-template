@@ -14,7 +14,7 @@ export class sDemo {
 
     this.speed = [0.1]
 
-    this.colour = [
+    this.colour_frequencies = [
       100 - 200 * Math.random(),
       100 - 200 * Math.random(),
       100 - 200 * Math.random()

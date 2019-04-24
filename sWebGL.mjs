@@ -116,8 +116,6 @@ export class sWebGL {
     // Default speed
     gl.uniform1f(this.speed_location, Math.random())
 
-    console.log(this.speed_location)
-
     // Time
     this.time_location = gl.getUniformLocation(shader_program, 'u_time')
 
