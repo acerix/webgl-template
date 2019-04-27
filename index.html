@@ -240,6 +240,12 @@ window.onload = function() {
 
   }
 
+  // Set actor params defaults
+  param_handler.params[['speed',0].join('_')] = actor.speed[0]
+  param_handler.params[['colour_frequencies',0].join('_')] = actor.colour_frequencies[0]
+  param_handler.params[['colour_frequencies',1].join('_')] = actor.colour_frequencies[1]
+  param_handler.params[['colour_frequencies',2].join('_')] = actor.colour_frequencies[2]
+
   // Parse supplies params
   param_handler.parse(false)
 
@@ -264,6 +270,7 @@ window.onload = function() {
         break;
 
     }
+    //param_handler.params[param_name] = param_handler.params[param_name]
   }
 
   // Point in time counter (eg. frame number)
@@ -307,8 +314,8 @@ window.onload = function() {
     actor.speed,
     'speed',
     {
-      min: 0,
-      max: 10,
+      min: -5,
+      max: 5,
       onchange: function(name) {
         var indexes = name.split('_')
         param_handler.params[name] = actor.speed[indexes[1]].toFixed(3)
