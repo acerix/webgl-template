@@ -314,8 +314,8 @@ window.onload = function() {
     actor.speed,
     'speed',
     {
-      min: -5,
-      max: 5,
+      min: -2,
+      max: 2,
       onchange: function(name) {
         var indexes = name.split('_')
         param_handler.params[name] = actor.speed[indexes[1]].toFixed(3)
