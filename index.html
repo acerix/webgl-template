@@ -87,6 +87,9 @@ window.onload = function() {
     param_handler.update()
   }
 
+  // Keep track of tweak number
+  var tweak_counter = 0
+
   // Init Web GL
   var swgl = new sWebGL({
     plugins: {
@@ -187,6 +190,28 @@ window.onload = function() {
           },
 
         }
+      }),
+      'tweak': new sTweak({
+        periodic: [
+          {
+            every: 1,
+            call: function() {
+              console.log(tweak_counter++)
+            }
+          },
+          {
+            every: 10,
+            call: function() {
+              incrementZoom(-1)
+            }
+          },
+          {
+            every: 30,
+            call: function() {
+              movePosition(0.5 - Math.random(),  0.5 - Math.random())
+            }
+          }
+        ]
       })
 
     }
@@ -234,7 +259,7 @@ window.onload = function() {
   var param_name = ['speed',0].join('_')
   param_handler.params[param_name] = actor.speed[0]
   param_handler.onchange[param_name] = function(v) {
-    console.log('s', i)
+    //console.log('s', i)
     actor.speed[0] = v
   }
 
@@ -243,7 +268,7 @@ window.onload = function() {
     var param_name = ['colour_frequencies',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
     param_handler.onchange[param_name] = function(v) {
-      console.log('c', i)
+      //console.log('c', i)
       swgl.color_params_location[param_name] = param_handler.params[param_name]
       actor.colour_frequencies[i] = v
     }

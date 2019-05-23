@@ -10,7 +10,11 @@ export class sTweak {
 
     if (typeof options === 'undefined') options = {}
 
-    console.log('Tweak!')
+    if (typeof options.periodic === 'object') {
+      for (var i in options.periodic) {
+        setInterval(options.periodic[i].call, options.periodic[i].every * 1000)
+      }
+    }
 
   }
 
