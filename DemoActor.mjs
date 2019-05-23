@@ -1,8 +1,8 @@
 'set strict'
 
-/** sWebGL Demo Actor */
+/** DemoActor: An example actor */
 
-export class sDemo {
+export class DemoActor {
 
   constructor(options) {
 

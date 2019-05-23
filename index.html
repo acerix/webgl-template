@@ -32,21 +32,12 @@ uniform float u_time;
 
 void main() {
 
-  // Get final coordinates
+  // Normalize coordinates
   float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
   float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
 
   // Let z be the squared-distance from the origin, drawing a circle
   float z = x * x + y * y;
-
-  //z = x - y; // line
-  //z = x * x - y; // parabola
-  //z = x * y - 1.0; // hyperbola
-  //z = x * x + y * y; // circle
-  //z = -1.0 + x * x * x * y * y * y; // fermat curve
-  //z = -2.0 * x * x + x * x * x * x + 2.0 * y * y + 2.0 * x * x * y * y + y * y * y * y;  // lemniscate of bernoulli
-  //z = 0.0 - x * x + x * x * x * x + y * y;  // lemniscate of gerono
-  //z = x * x * x - 3.0 * x * y + y * y * y;  // folium of descartes
 
   // Set pixel colours from periodic functions on z
   gl_FragColor.r = sin(z * u_color_params.r - u_time * u_speed) / 2.0 + 0.5;
@@ -67,9 +58,10 @@ import {sParams} from './sParams.mjs'
 import {sPanel} from './sPanel.mjs'
 import {sMouse} from './sMouse.mjs'
 import {sKeys} from './sKeys.mjs'
+import {sTweak} from './sTweak.mjs'
 
-import {sDemo} from './sDemo.mjs'
-
+import {DemoActor} from './DemoActor.mjs'
+import {DemoPlugin} from './DemoPlugin.mjs'
 
 window.onload = function() {
 
@@ -98,6 +90,8 @@ window.onload = function() {
   // Init Web GL
   var swgl = new sWebGL({
     plugins: {
+
+      //'demo': new DemoPlugin({ message: 'Hello sWorld!' }),
 
       'mouse': new sMouse({
         onDown: {
@@ -183,11 +177,6 @@ window.onload = function() {
             movePosition( 0, -1)
           },
 
-          //
-          70: function() {
-            console.log(atob('UGF5IHJlc3BlY3Rz'))
-          },
-
           // +: Zoom in
           107: function() {
             incrementZoom(1)
@@ -216,7 +205,7 @@ window.onload = function() {
   }
 
   // Draw something as a demo
-  var actor = new sDemo()
+  var actor = new DemoActor()
   swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
 
   // Get params from URL hash and update URL when they change
@@ -240,11 +229,28 @@ window.onload = function() {
 
   }
 
-  // Set actor params defaults
-  param_handler.params[['speed',0].join('_')] = actor.speed[0]
-  param_handler.params[['colour_frequencies',0].join('_')] = actor.colour_frequencies[0]
-  param_handler.params[['colour_frequencies',1].join('_')] = actor.colour_frequencies[1]
-  param_handler.params[['colour_frequencies',2].join('_')] = actor.colour_frequencies[2]
+  // Set actor params defaults and onchange callbacks
+
+  var param_name = ['speed',0].join('_')
+  param_handler.params[param_name] = actor.speed[0]
+  param_handler.onchange[param_name] = function(v) {
+    console.log('s', i)
+    actor.speed[0] = v
+  }
+
+
+  for (var i=0;i<2;i++) {
+    var param_name = ['colour_frequencies',i].join('_')
+    param_handler.params[param_name] = actor.colour_frequencies[0]
+    param_handler.onchange[param_name] = function(v) {
+      console.log('c', i)
+      swgl.color_params_location[param_name] = param_handler.params[param_name]
+      actor.colour_frequencies[i] = v
+    }
+  }
+  swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
+
+  // Set actor params
 
   // Parse supplies params
   param_handler.parse(false)
