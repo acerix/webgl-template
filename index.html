@@ -269,8 +269,8 @@ window.onload = function() {
     swgl.gl.uniform1f(swgl.speed_location, actor.speed[0])
   }
 
-
-  for (let i=0;i<2;i++) {
+  for (let i=0;i<3;i++) {
+    console.log(i)
     let param_name = ['colour_frequencies',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
     param_handler.onChange[param_name] = function(v) {
