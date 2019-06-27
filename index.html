@@ -235,7 +235,7 @@ window.onload = function() {
 
   // Get params from URL hash and update URL when they change
   var param_handler = new sParams({
-    onchange: {
+    onChange: {
       'x': updateTransformLocation,
       'y': updateTransformLocation,
       'z': updateScaleLocation
@@ -254,11 +254,11 @@ window.onload = function() {
 
   }
 
-  // Set actor params defaults and onchange callbacks
+  // Set actor params defaults and onChange callbacks
 
   var param_name = ['speed',0].join('_')
   param_handler.params[param_name] = actor.speed[0]
-  param_handler.onchange[param_name] = function(v) {
+  param_handler.onChange[param_name] = function(v) {
     //console.log('s', i)
     actor.speed[0] = v
   }
@@ -267,7 +267,7 @@ window.onload = function() {
   for (var i=0;i<2;i++) {
     var param_name = ['colour_frequencies',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
-    param_handler.onchange[param_name] = function(v) {
+    param_handler.onChange[param_name] = function(v) {
       //console.log('c', i)
       swgl.color_params_location[param_name] = param_handler.params[param_name]
       actor.colour_frequencies[i] = v
@@ -347,7 +347,7 @@ window.onload = function() {
     {
       min: -2,
       max: 2,
-      onchange: function(name) {
+      onChange: function(name) {
         var indexes = name.split('_')
         param_handler.params[name] = actor.speed[indexes[1]].toFixed(3)
         swgl.speed_location[indexes[1]] = param_handler.params[name]
@@ -362,7 +362,7 @@ window.onload = function() {
     {
       min: -100,
       max: 100,
-      onchange: function(name) {
+      onChange: function(name) {
         var indexes = ['', +name.substring(name.lastIndexOf('_') + 1)]
         param_handler.params[name] = actor.colour_frequencies[indexes[1]].toFixed(3)
         swgl.color_params_location[indexes[1]] = param_handler.params[name]

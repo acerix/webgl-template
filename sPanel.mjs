@@ -83,8 +83,8 @@ export class sPanel {
     if (typeof options.max === 'undefined') {
       options.max = 2.0
     }
-    if (typeof options.onchange === 'undefined') {
-      options.onchange = null
+    if (typeof options.onChange === 'undefined') {
+      options.onChange = null
     }
 
     // Table row
@@ -120,18 +120,18 @@ export class sPanel {
     tr.appendChild(range_input_td)
 
     // Callbacks when inputs change
-    text_input.onchange = function(event) {
+    text_input.onChange = function(event) {
       params[i] = +event.target.value
       range_input.value = params[i]
-      if (typeof options.onchange === 'function') {
-        options.onchange(name)
+      if (typeof options.onChange === 'function') {
+        options.onChange(name)
       }
     }
-    range_input.oninput = range_input.onchange = function(event) {
+    range_input.oninput = range_input.onChange = function(event) {
       params[i] = +event.target.value
       text_input.value = params[i].toFixed(3)
-      if (typeof options.onchange === 'function') {
-        options.onchange(name)
+      if (typeof options.onChange === 'function') {
+        options.onChange(name)
       }
     }
 
