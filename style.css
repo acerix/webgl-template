@@ -36,13 +36,17 @@ a:hover {
   position: fixed;
   top: 10px;
   right: 10px;
+  /*
   opacity: 0;
   transition: opacity 0.4s;
+  */
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
+/*
 .panel:hover {
   opacity: 1.0;
 }
+*/
 .panel table {
   font-family: monospace;
   text-align: right;
