@@ -10,7 +10,7 @@ export class DemoActor {
 
     if (typeof options ==='undefined') options = {}
 
-    this.position = vec2.create()
+    this.position = glMatrix.vec2.create()
 
     this.speed = [0.1]
 
