@@ -120,7 +120,7 @@ export class sPanel {
     tr.appendChild(range_input_td)
 
     // Callbacks when inputs change
-    text_input.onChange = function(event) {
+    text_input.onchange = function(event) {
       params[i] = +event.target.value
       range_input.value = params[i]
       if (typeof options.onChange === 'function') {
