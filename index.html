@@ -66,21 +66,21 @@ import {DemoActor} from './DemoActor.mjs'
 window.onload = function() {
 
   // Keep track of where the mouse was while dragging
-  let mouse_left_drag_last_position = [0, 0]
+  var mouse_left_drag_last_position = [0, 0]
 
   // Keep track of when each button is pressed to know which button was pressed first
-  let mouse_left_last_click = 0
-  let mouse_right_last_click = 0
+  var mouse_left_last_click = 0
+  var mouse_right_last_click = 0
 
   // Increment the zoom level (scale)
-  let incrementZoom = function(increment, towards) {
+  var incrementZoom = function(increment, towards) {
     param_handler.params.z = ( 1 + increment / 16 ) * param_handler.params.z
     updateScaleLocation()
     param_handler.update()
   }
 
   // Move position (translate)
-  let movePosition = function(x, y) {
+  var movePosition = function(x, y) {
     param_handler.params.x = (x + +param_handler.params.x).toFixed(5)
     param_handler.params.y = (y + +param_handler.params.y).toFixed(5)
     updateTransformLocation()
@@ -88,10 +88,10 @@ window.onload = function() {
   }
 
   // Keep track of tweak number
-  let tweak_counter = 0
+  var tweak_counter = 0
 
   // Init Web GL
-  let swgl = new sWebGL({
+  var swgl = new sWebGL({
     plugins: {
 
       //'demo': new DemoPlugin({ message: 'Hello sWorld!' }),
@@ -120,8 +120,8 @@ window.onload = function() {
             // if right-click is not also pressed
             if (swgl.plugins.mouse.b[2] === 0) {
               // Move by dragging
-              let z = param_handler.params.z * 7
-              let mouse_delta = [
+              var z = param_handler.params.z * 7
+              var mouse_delta = [
                 swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
                 swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
               ]
@@ -220,23 +220,23 @@ window.onload = function() {
   })
 
   // Callback functions when params are changed
-  let updateTransformLocation = function() {
+  var updateTransformLocation = function() {
     swgl.gl.uniform2f(
       swgl.transform_location,
       +param_handler.params.x + swgl.canvas.centre[0] / swgl.smallestScreenEdge(),
       +param_handler.params.y + swgl.canvas.centre[1] / swgl.smallestScreenEdge()
     )
   }
-  let updateScaleLocation = function(v) {
+  var updateScaleLocation = function(v) {
     swgl.gl.uniform1f(swgl.scale_location, param_handler.params.z)
   }
 
   // Draw something as a demo
-  let actor = new DemoActor()
+  var actor = new DemoActor()
   swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
 
   // Get params from URL hash and update URL when they change
-  let param_handler = new sParams({
+  var param_handler = new sParams({
     onChange: {
       'x': updateTransformLocation,
       'y': updateTransformLocation,
@@ -258,7 +258,7 @@ window.onload = function() {
 
   // Set actor params defaults and onChange callbacks
 
-  let param_name = ['speed',0].join('_')
+  var param_name = ['speed',0].join('_')
   param_handler.params[param_name] = actor.speed[0]
   param_handler.onChange[param_name] = function(v) {
     //console.log('s', i)
@@ -267,8 +267,8 @@ window.onload = function() {
   }
 
 
-  for (let i=0;i<2;i++) {
-    let param_name = ['colour_frequencies',i].join('_')
+  for (var i=0;i<2;i++) {
+    var param_name = ['colour_frequencies',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
     param_handler.onChange[param_name] = function(v) {
       //console.log('c', i)
@@ -292,8 +292,8 @@ window.onload = function() {
   updateScaleLocation()
 
   // Set actor params from URL hash
-  for (let param_name in param_handler.params) {
-    let indexes = param_name.split('_')
+  for (var param_name in param_handler.params) {
+    var indexes = param_name.split('_')
     switch (indexes[0]) {
 
       case 'colour_frequencies':
@@ -309,11 +309,11 @@ window.onload = function() {
   }
 
   // Point in time counter (eg. frame number)
-  let pot = 0
+  var pot = 0
 
-  let color_offsets = glMatrix.vec3.create()
+  var color_offsets = glMatrix.vec3.create()
   glMatrix.vec3.random(color_offsets)
-  let color_frequencies = glMatrix.vec3.create()
+  var color_frequencies = glMatrix.vec3.create()
   glMatrix.vec3.random(color_frequencies, 0.05)
 
   swgl.drawScene = function() {
@@ -323,8 +323,8 @@ window.onload = function() {
     swgl.gl.uniform1f(swgl.time_location, pot)
 
     if (typeof swgl.plugins === 'object') {
-      for (let i in swgl.plugins) if (swgl.plugins[i].hasOwnProperty('whileDown')) {
-        for (let j in swgl.plugins[i].whileDown) {
+      for (var i in swgl.plugins) if (swgl.plugins[i].hasOwnProperty('whileDown')) {
+        for (var j in swgl.plugins[i].whileDown) {
           if (swgl.plugins[i].b[j]) {
             swgl.plugins[i].whileDown[j]()
           }
@@ -343,7 +343,7 @@ window.onload = function() {
   }
 
   // Draw the actor control panel
-  let panel = new sPanel()
+  var panel = new sPanel()
 
   panel.drawSliders(
     actor.speed,
@@ -352,7 +352,7 @@ window.onload = function() {
       min: -2,
       max: 2,
       onChange: function(name) {
-        let indexes = name.split('_')
+        var indexes = name.split('_')
         param_handler.params[name] = actor.speed[indexes[1]].toFixed(3)
         swgl.speed_location[indexes[1]] = param_handler.params[name]
         swgl.gl.uniform1f(swgl.speed_location, actor.speed[0])
@@ -367,7 +367,7 @@ window.onload = function() {
       min: -100,
       max: 100,
       onChange: function(name) {
-        let indexes = ['', +name.substring(name.lastIndexOf('_') + 1)]
+        var indexes = ['', +name.substring(name.lastIndexOf('_') + 1)]
         param_handler.params[name] = actor.colour_frequencies[indexes[1]].toFixed(3)
         swgl.color_params_location[indexes[1]] = param_handler.params[name]
         swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])

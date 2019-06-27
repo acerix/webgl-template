@@ -30,6 +30,13 @@ export class sPanel {
     reset_button.href = ''
     panel_buttons.appendChild(reset_button)
 
+    /*
+    let random_button = document.createElement('a')
+    random_button.textContent = 'Random'
+    random_button.href = '#random'
+    panel_buttons.appendChild(random_button)
+    */
+
     let toggle_panel_button = document.createElement('a')
     toggle_panel_button.textContent = 'Control Panel'
     toggle_panel_button.onclick = function() {

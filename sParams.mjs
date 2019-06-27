@@ -6,7 +6,7 @@ export class sParams {
 
   constructor(options) {
 
-    let self = this
+    var self = this
 
     if (typeof options ==='undefined') options = {}
 
@@ -40,8 +40,8 @@ export class sParams {
 
   // Parse parameters from the URL hash
   parse(runCallbacks) {
-    let new_params = this._unserialize( window.location.hash.substr(1) )
-    for (let i in new_params) {
+    var new_params = this._unserialize( window.location.hash.substr(1) )
+    for (var i in new_params) {
 
       // Only allow numbers, convert to int if whole otherwise float
       this.params[i] = new_params[i] % 1 === 0 ? parseInt(new_params[i], 10) : parseFloat(new_params[i])
@@ -55,14 +55,14 @@ export class sParams {
   // Serialize params into a string
   // jquery-param (c) 2015 KNOWLEDGECODE | MIT
   _serialize(a) {
-    let s = []
-    let add = function (k, v) {
+    var s = []
+    var add = function (k, v) {
       v = typeof v === 'function' ? v() : v
       v = v === null ? '' : v === undefined ? '' : v
       s[s.length] = encodeURIComponent(k) + '=' + encodeURIComponent(v)
     }
-    let buildParams = function (prefix, obj) {
-      let i, len, key
+    var buildParams = function (prefix, obj) {
+      var i, len, key
       if (prefix) {
         if (Array.isArray(obj)) {
           for (i = 0, len = obj.length; i < len; i++) {
@@ -96,7 +96,7 @@ export class sParams {
   // based on https://stackoverflow.com/a/26849194
   _unserialize(s) {
     return s.split('&').reduce(function (params, param) {
-      let paramSplit = param.split('=').map(function (value) {
+      var paramSplit = param.split('=').map(function (value) {
         return decodeURIComponent(value.replace(/\\+/g, ' '))
       })
       params[paramSplit[0]] = paramSplit[1]
