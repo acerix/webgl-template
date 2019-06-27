@@ -122,7 +122,8 @@ window.onload = function() {
               return
             }
             // Move by dragging
-            let z = param_handler.params.z * 7
+            // @todo fix this calculation so the display is fixed to the mouse position while dragging
+            let z = param_handler.params.z * 300
             let mouse_delta = [
               swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
               swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
@@ -255,6 +256,11 @@ window.onload = function() {
 
       // Zoom
       z: 0.1,
+
+      // Colour frequencies
+      c_0: 0.1, // Red
+      c_1: 0.1, // Green
+      c_2: 0.1, // Blue
 
   }
 
