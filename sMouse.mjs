@@ -6,7 +6,7 @@ export class sMouse {
 
   constructor(options) {
 
-    var self = this
+    let self = this
 
     if (typeof options ==='undefined') options = {}
 
@@ -36,8 +36,8 @@ export class sMouse {
 
   init(swgl) {
 
-    var self = this
-    var target = swgl.canvas
+    let self = this
+    let target = swgl.canvas
 
     // Handle mouse move
     target.onmousemove = function(e) {

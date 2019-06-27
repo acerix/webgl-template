@@ -8,7 +8,7 @@ export class sWebGL {
 
   constructor(options) {
 
-    var self = this
+    let self = this
 
     if (typeof options ==='undefined') options = {}
 
@@ -62,7 +62,7 @@ export class sWebGL {
 
     // Init plugins
     if (typeof this.plugins === 'object') {
-      for (var i in this.plugins) if (typeof this.plugins[i].init === 'function') {
+      for (let i in this.plugins) if (typeof this.plugins[i].init === 'function') {
         this.plugins[i].init(this)
       }
     }
@@ -74,7 +74,7 @@ export class sWebGL {
 
   // Begin or restart rendering
   init() {
-    var gl = this.gl
+    let gl = this.gl
     //gl.clearColor(0.0, 0.0, 0.0, 1.0)
     //gl.clearDepth(1.0)
     //gl.enable(gl.DEPTH_TEST)
@@ -84,12 +84,12 @@ export class sWebGL {
 
   // Load shaders
   initShaders() {
-    var gl = this.gl
+    let gl = this.gl
 
-    var shader_program = gl.createProgram()
+    let shader_program = gl.createProgram()
 
     // Attach shaders
-    for (var i in SHADER_ELEMENT_IDS) {
+    for (let i in SHADER_ELEMENT_IDS) {
       gl.attachShader(shader_program, this.getShader(SHADER_ELEMENT_IDS[i]))
     }
 
@@ -102,7 +102,7 @@ export class sWebGL {
     gl.useProgram(shader_program)
 
     // Position of vertex data
-    var position_location = gl.getAttribLocation(shader_program, 'a_position')
+    let position_location = gl.getAttribLocation(shader_program, 'a_position')
 
     // Screen resolution
     this.resolution_location = gl.getUniformLocation(shader_program, 'u_resolution')
@@ -129,7 +129,7 @@ export class sWebGL {
     gl.uniform3f(this.color_params_location, 1, 1, 1)
 
     // Position vertices
-    var vertices = new Float32Array([
+    let vertices = new Float32Array([
        1,  1,  0,
       -1,  1,  0,
        1, -1,  0,
@@ -137,7 +137,7 @@ export class sWebGL {
     ])
 
     // Bind position buffer
-    var vertex_buffer = gl.createBuffer()
+    let vertex_buffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
     gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW)
     gl.vertexAttribPointer(position_location, 3, gl.FLOAT, false, 0, 0)
@@ -150,7 +150,7 @@ export class sWebGL {
   life(self) {
 
     // Pass sWebGL instance in the callback
-    var callback = function() {
+    let callback = function() {
       self.life(self)
     }
 
@@ -166,12 +166,12 @@ export class sWebGL {
 
   // Load shader from <script>
   getShader(id) {
-    var gl = this.gl
-    var scriptElement = document.getElementById(id)
+    let gl = this.gl
+    let scriptElement = document.getElementById(id)
     if (scriptElement === null) {
       throw new Error('Shader script element "' + id + '" not found')
     }
-    var shader = gl.createShader(gl[scriptElement.type.replace('text/x-','').replace('-','_').toUpperCase()])
+    let shader = gl.createShader(gl[scriptElement.type.replace('text/x-','').replace('-','_').toUpperCase()])
     gl.shaderSource(shader, scriptElement.textContent)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {

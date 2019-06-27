@@ -6,7 +6,7 @@ export class sKeys {
 
   constructor(options) {
 
-    var self = this
+    let self = this
 
     if (typeof options ==='undefined') options = {}
 
@@ -24,7 +24,7 @@ export class sKeys {
 
     // Handle key down
     window.onkeydown = function(e) {
-      var k = (e?e:event).which
+      let k = (e?e:event).which
       self.b[k] = 1
       if (typeof self.onDown[k] === 'function') {
         self.onDown[k]()
@@ -34,7 +34,7 @@ export class sKeys {
 
     // Handle key up
     window.onkeyup = function(e) {
-      var k = (e?e:event).which
+      let k = (e?e:event).which
       self.b[k] = 0
       if (typeof self.onUp[k] === 'function') {
         self.onUp[k]()

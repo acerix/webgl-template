@@ -6,7 +6,7 @@ export class DemoActor {
 
   constructor(options) {
 
-    var self = this
+    let self = this
 
     if (typeof options ==='undefined') options = {}
 
