@@ -117,19 +117,19 @@ window.onload = function() {
 
           // left-click
           0: function() {
-            // if right-click is not also pressed
-            if (swgl.plugins.mouse.b[2] === 0) {
-              // Move by dragging
-              let z = param_handler.params.z * 7
-              let mouse_delta = [
-                swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
-                swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
-              ]
-              mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
-              if (mouse_delta[0] || mouse_delta[1]) {
-                movePosition(-mouse_delta[0], mouse_delta[1])
-              }
-
+            // ignore when right-click is also pressed
+            if (swgl.plugins.mouse.b[2] !== 0) {
+              return
+            }
+            // Move by dragging
+            let z = param_handler.params.z * 7
+            let mouse_delta = [
+              swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
+              swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
+            ]
+            mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
+            if (mouse_delta[0] || mouse_delta[1]) {
+              movePosition(-mouse_delta[0], mouse_delta[1])
             }
           },
 
