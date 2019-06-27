@@ -76,7 +76,6 @@ window.onload = function() {
   let incrementZoom = function(increment, towards) {
     param_handler.params.z = ( 1 + increment / 16 ) * param_handler.params.z
     updateScaleLocation()
-    console.log(param_handler.params.z)
     param_handler.update()
   }
 
