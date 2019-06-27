@@ -123,7 +123,7 @@ window.onload = function() {
             }
             // Move by dragging
             // @todo fix this calculation so the display is fixed to the mouse position while dragging
-            let z = param_handler.params.z * 300
+            let z = param_handler.params.z * 10
             let mouse_delta = [
               swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
               swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
@@ -266,14 +266,16 @@ window.onload = function() {
 
   // Set actor params defaults and onChange callbacks
 
+  // Speed param
   let param_name = ['s',0].join('_')
   param_handler.params[param_name] = actor.speed[0]
   param_handler.onChange[param_name] = function(v) {
-    //console.log('s', i)
     actor.speed[0] = v
     swgl.gl.uniform1f(swgl.speed_location, actor.speed[0])
+    // @todo update setting in panel
   }
 
+  // Colour frequency params (R,G,B)
   for (let i=0;i<3;i++) {
     let param_name = ['c',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
@@ -282,12 +284,13 @@ window.onload = function() {
       actor.colour_frequencies[i] = v
       swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
     }
+    // @todo update setting in panel
   }
-  swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
+
 
   // Set actor params
 
-  // Parse supplies params
+  // Parse supplied params
   param_handler.parse(false)
 
   // Update params in URL hash
@@ -302,17 +305,23 @@ window.onload = function() {
     let indexes = param_name.split('_')
     switch (indexes[0]) {
 
-      case 'colour_frequencies':
-        actor.colour_frequencies[indexes[1]] = param_handler.params[param_name]
+      // Speed
+      case 's':
+        actor.speed[indexes[1]] = param_handler.params[param_name]
         break;
 
-      case 'speed':
-        actor.speed[indexes[1]] = param_handler.params[param_name]
+      // Colour frequencies
+      case 'c':
+        actor.colour_frequencies[indexes[1]] = param_handler.params[param_name]
         break;
 
     }
     //param_handler.params[param_name] = param_handler.params[param_name]
   }
+
+  // Set initial webgl params
+  swgl.gl.uniform1f(swgl.speed_location, actor.speed[0])
+  swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
 
   // Point in time counter (eg. frame number)
   let pot = 0
