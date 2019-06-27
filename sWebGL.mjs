@@ -2,6 +2,8 @@
 
 /* WebGL utilities */
 
+export const SHADER_ELEMENT_IDS = ['vertex-shader', 'fragment-shader']
+
 export class sWebGL {
 
   constructor(options) {
@@ -87,8 +89,9 @@ export class sWebGL {
     var shader_program = gl.createProgram()
 
     // Attach shaders
-    gl.attachShader(shader_program, this.getShader('shader-vs'))
-    gl.attachShader(shader_program, this.getShader('shader-fs'))
+    for (var i in SHADER_ELEMENT_IDS) {
+      gl.attachShader(shader_program, this.getShader(SHADER_ELEMENT_IDS[i]))
+    }
 
     gl.linkProgram(shader_program)
 
@@ -168,7 +171,7 @@ export class sWebGL {
     if (scriptElement === null) {
       throw new Error('Shader script element "' + id + '" not found')
     }
-    var shader = gl.createShader(gl[scriptElement.type.replace('text/x-','').toUpperCase()])
+    var shader = gl.createShader(gl[scriptElement.type.replace('text/x-','').replace('-','_').toUpperCase()])
     gl.shaderSource(shader, scriptElement.textContent)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
