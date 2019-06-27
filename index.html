@@ -270,7 +270,6 @@ window.onload = function() {
   }
 
   for (let i=0;i<3;i++) {
-    console.log(i)
     let param_name = ['colour_frequencies',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
     param_handler.onChange[param_name] = function(v) {
