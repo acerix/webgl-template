@@ -260,7 +260,7 @@ window.onload = function() {
 
   // Set actor params defaults and onChange callbacks
 
-  let param_name = ['speed',0].join('_')
+  let param_name = ['s',0].join('_')
   param_handler.params[param_name] = actor.speed[0]
   param_handler.onChange[param_name] = function(v) {
     //console.log('s', i)
@@ -269,10 +269,9 @@ window.onload = function() {
   }
 
   for (let i=0;i<3;i++) {
-    let param_name = ['colour_frequencies',i].join('_')
+    let param_name = ['c',i].join('_')
     param_handler.params[param_name] = actor.colour_frequencies[0]
     param_handler.onChange[param_name] = function(v) {
-      //console.log('c', i)
       swgl.color_params_location[param_name] = param_handler.params[param_name]
       actor.colour_frequencies[i] = v
       swgl.gl.uniform3f(swgl.color_params_location, actor.colour_frequencies[0], actor.colour_frequencies[1], actor.colour_frequencies[2])
@@ -348,7 +347,7 @@ window.onload = function() {
 
   panel.drawSliders(
     actor.speed,
-    'speed',
+    's',
     {
       min: -2,
       max: 2,
@@ -363,7 +362,7 @@ window.onload = function() {
   )
   panel.drawSliders(
     actor.colour_frequencies,
-    'colour_frequencies',
+    'c',
     {
       min: -100,
       max: 100,
