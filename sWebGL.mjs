@@ -185,26 +185,4 @@ export class sWebGL {
     return Math.min(this.canvas.height, this.canvas.width)
   }
 
-  // Convert x from screen basis to gl basis
-  xFromScreenBasis(x, z) {
-    return x / z * this.smallestScreenEdge() - this.canvas.centre[0]
-  }
-
-  // Convert y from screen basis to gl basis
-  yFromScreenBasis(y, z) {
-    return y / z * this.smallestScreenEdge() - this.canvas.centre[1]
-  }
-
-  // Convert x to screen basis from gl basis
-  xToScreenBasis(x, z) {
-    //return x + this.canvas.centre[0]
-    return (x + this.canvas.centre[0]) / this.smallestScreenEdge() * z
-  }
-
-  // Convert y to screen basis from gl basis
-  yToScreenBasis(y, z) {
-    //return y + this.canvas.centre[1]
-    return (y + this.canvas.centre[1]) / this.smallestScreenEdge() * z
-  }
-
 }

@@ -33,8 +33,8 @@ uniform float u_time;
 void main() {
 
   // Normalize coordinates
-  float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) / u_scale;
-  float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) / u_scale;
+  float x = ( gl_FragCoord.x / u_resolution - u_transform.x ) * u_scale;
+  float y = ( gl_FragCoord.y / u_resolution - u_transform.y ) * u_scale;
 
   // Let z be the squared-distance from the origin, drawing a circle
   float z = x * x + y * y;
@@ -74,7 +74,7 @@ window.onload = function() {
 
   // Increment the zoom level (scale)
   let incrementZoom = function(increment, towards) {
-    param_handler.params.z = ( 1 + increment / 16 ) * param_handler.params.z
+    param_handler.params.z *= ( 1 + increment / 16 )
     updateScaleLocation()
     param_handler.update()
   }
@@ -123,14 +123,19 @@ window.onload = function() {
             }
             // Move by dragging
             // @todo fix this calculation so the display is fixed to the mouse position while dragging
-            let z = param_handler.params.z * 10
+            let z = param_handler.params.z
             let mouse_delta = [
-              swgl.xToScreenBasis(mouse_left_drag_last_position[0], z) - swgl.xToScreenBasis(swgl.plugins.mouse.p[0], z),
-              swgl.yToScreenBasis(mouse_left_drag_last_position[1], z) - swgl.yToScreenBasis(swgl.plugins.mouse.p[1], z)
+              mouse_left_drag_last_position[0] - swgl.plugins.mouse.p[0],
+              mouse_left_drag_last_position[1] - swgl.plugins.mouse.p[1]
             ]
-            mouse_left_drag_last_position = swgl.plugins.mouse.p.slice(0)
+            mouse_left_drag_last_position[0] = swgl.plugins.mouse.p[0]
+            mouse_left_drag_last_position[1] = swgl.plugins.mouse.p[1]
             if (mouse_delta[0] || mouse_delta[1]) {
-              movePosition(-mouse_delta[0], mouse_delta[1])
+              let delta_factor = 1 / swgl.smallestScreenEdge()
+              movePosition(
+                -mouse_delta[0] * delta_factor,
+                mouse_delta[1] * delta_factor
+              )
             }
           },
 
@@ -149,7 +154,7 @@ window.onload = function() {
 
         },
         onWheel: function(i) {
-          incrementZoom(-i, swgl.plugins.mouse.p)
+          incrementZoom(i, swgl.plugins.mouse.p)
         },
 
       }),
@@ -183,11 +188,11 @@ window.onload = function() {
 
           // +: Zoom in
           107: function() {
-            incrementZoom(1)
+            incrementZoom(-1)
           },
           // -: Zoom out
           109: function() {
-            incrementZoom(-1)
+            incrementZoom(1)
           },
 
         }
@@ -255,7 +260,7 @@ window.onload = function() {
       y: 0,
 
       // Zoom
-      z: 0.1,
+      z: 5,
 
       // Colour frequencies
       c_0: 0.1, // Red
